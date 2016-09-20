@@ -28,7 +28,7 @@ module.exports = function(ctx) {
     ctx.map.fire(Constants.events.CREATE, {
       features: [point.toGeoJSON()]
     });
-    ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id] });
+    ctx.events.changeMode(Constants.modes.STATIC, { featureIds: [point.id] });
   }
 
   return {

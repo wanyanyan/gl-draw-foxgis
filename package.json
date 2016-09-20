@@ -1,9 +1,9 @@
 {
-  "name": "mapbox-gl-draw",
+  "name": "gl-draw-foxgis",
   "version": "0.11.19",
   "description": "A drawing component for Mapbox GL JS",
-  "homepage": "https://github.com/mapbox/mapbox-gl-draw",
-  "author": "mapbox",
+  "homepage": "https://github.com/wanyanyan/gl-draw-foxgis",
+  "author": "mapbox wanyanyan",
   "license": "ISC",
   "main": "index.js",
   "browserify": {
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mapbox/mapbox-gl-draw.git"
+    "url": "git://github.com/wanyanyan/gl-draw-foxgis.git"
   },
   "keywords": [
     "webgl",
