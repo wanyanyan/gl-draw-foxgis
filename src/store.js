@@ -137,7 +137,8 @@ Store.prototype.get = function(id) {
  * @return {Array<Object>}
  */
 Store.prototype.getAll = function() {
-  return Object.keys(this._features).map(function(id){return this._features[id]});
+  var _this = this;
+  return Object.keys(this._features).map(function(id){return _this._features[id]});
 };
 
 /**
