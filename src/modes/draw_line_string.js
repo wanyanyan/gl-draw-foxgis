@@ -34,14 +34,14 @@ module.exports = function(ctx) {
       });
       this.on('click', CommonSelectors.true, function(e){
         if(currentVertexPosition > 0 && isEventAtCoordinates(e, line.coordinates[currentVertexPosition - 1])) {
-          return ctx.events.changeMode(Constants.modes.STATIC, { featureIds: [line.id] });
+          return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
         line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         currentVertexPosition++;
       });
       this.on('click', CommonSelectors.isVertex, function(){
-        return ctx.events.changeMode(Constants.modes.STATIC, { featureIds: [line.id] });
+        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
       });
       this.on('keyup', CommonSelectors.isEscapeKey, function(){
         ctx.store.delete([line.id], { silent: true });
