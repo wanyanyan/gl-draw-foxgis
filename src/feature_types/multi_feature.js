@@ -26,14 +26,15 @@ var MultiFeature = function(ctx, geojson) {
 MultiFeature.prototype = Object.create(Feature.prototype);
 
 MultiFeature.prototype._coordinatesToFeatures = function(coordinates) {
+  var _this = this;
   return coordinates.map(function(coords){
-    return new this.model(this.ctx, {
-    id: this.id,
+    return new _this.model(_this.ctx, {
+    id: _this.id,
     type: Constants.geojsonTypes.FEATURE,
     properties: {},
     geometry: {
       coordinates: coords,
-      type: this.type.replace('Multi', '')
+      type: _this.type.replace('Multi', '')
     }
   })});
 };
