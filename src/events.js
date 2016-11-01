@@ -3,21 +3,20 @@ var getFeaturesAndSetCursor = require('./lib/get_features_and_set_cursor');
 var isClick = require('./lib/is_click');
 var Constants = require('./constants');
 
-var modes = {
-  [Constants.modes.SIMPLE_SELECT]: require('./modes/simple_select'),
-  [Constants.modes.DIRECT_SELECT]: require('./modes/direct_select'),
-  [Constants.modes.DRAW_POINT]: require('./modes/draw_point'),
-  [Constants.modes.DRAW_LINE_STRING]: require('./modes/draw_line_string'),
-  [Constants.modes.DRAW_POLYGON]: require('./modes/draw_polygon'),
-  [Constants.modes.STATIC]: require('./modes/static')
-};
+var modes = {};
+modes[Constants.modes.SIMPLE_SELECT] = require('./modes/simple_select');
+modes[Constants.modes.DIRECT_SELECT] = require('./modes/direct_select');
+modes[Constants.modes.DRAW_POINT] = require('./modes/draw_point');
+modes[Constants.modes.DRAW_LINE_STRING] = require('./modes/draw_line_string');
+modes[Constants.modes.DRAW_POLYGON] = require('./modes/draw_polygon');
+modes[Constants.modes.STATIC] = require('./modes/static');
 
 module.exports = function(ctx) {
 
   var mouseDownInfo = {};
   var events = {};
-  var currentModeName = Constants.modes.SIMPLE_SELECT;
-  var currentMode = ModeHandler(modes.simple_select(ctx), ctx);
+  var currentModeName = Constants.modes.STATIC;
+  var currentMode = ModeHandler(modes.static(ctx), ctx);
 
   events.drag = function(event) {
     if (isClick(mouseDownInfo, {
@@ -72,7 +71,7 @@ module.exports = function(ctx) {
 
   // 8 - Backspace
   // 46 - Delete
-  var isKeyModeValid = (code) => !(code === 8 || code === 46 || (code >= 48 && code <= 57));
+  var isKeyModeValid = function(code){return !(code === 8 || code === 46 || (code >= 48 && code <= 57))};
 
   events.keydown = function(event) {
     if ((event.keyCode === 8 || event.keyCode === 46) && ctx.options.controls.trash) {
@@ -103,12 +102,13 @@ module.exports = function(ctx) {
     ctx.store.changeZoom();
   };
 
-  function changeMode(modename, nextModeOptions, eventOptions = {}) {
+  function changeMode(modename, nextModeOptions, eventOptions) {
+    if(eventOptions===undefined){eventOptions={};}
     currentMode.stop();
 
     var modebuilder = modes[modename];
     if (modebuilder === undefined) {
-      throw new Error(`${modename} is not valid`);
+      throw new Error(modename+" is not valid");
     }
     currentModeName = modename;
     var mode = modebuilder(ctx, nextModeOptions);
@@ -123,7 +123,7 @@ module.exports = function(ctx) {
   }
 
   var api = {
-    changeMode,
+    changeMode:changeMode,
     currentModeName: function() {
       return currentModeName;
     },

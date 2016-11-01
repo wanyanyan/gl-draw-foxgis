@@ -7,7 +7,7 @@ var models = {
   MultiPolygon: require('./polygon')
 };
 
-let takeAction = (features, action, path, lng, lat) => {
+var takeAction = function(features, action, path, lng, lat){
   var parts = path.split('.');
   var idx = parseInt(parts[0], 10);
   var tail = (!parts[1]) ? null : parts.slice(1).join('.');
@@ -19,14 +19,15 @@ var MultiFeature = function(ctx, geojson) {
 
   delete this.coordinates;
   this.model = models[geojson.geometry.type];
-  if (this.model === undefined) throw new TypeError(`${geojson.geometry.type} is not a valid type`);
+  if (this.model === undefined) throw new TypeError(geojson.geometry.type+" is not a valid type");
   this.features = this._coordinatesToFeatures(geojson.geometry.coordinates);
 };
 
 MultiFeature.prototype = Object.create(Feature.prototype);
 
 MultiFeature.prototype._coordinatesToFeatures = function(coordinates) {
-  return coordinates.map(coords => new this.model(this.ctx, {
+  return coordinates.map(function(coords){
+    return new this.model(this.ctx, {
     id: this.id,
     type: Constants.geojsonTypes.FEATURE,
     properties: {},
@@ -34,11 +35,11 @@ MultiFeature.prototype._coordinatesToFeatures = function(coordinates) {
       coordinates: coords,
       type: this.type.replace('Multi', '')
     }
-  }));
+  })});
 };
 
 MultiFeature.prototype.isValid = function() {
-  return this.features.every(f => f.isValid());
+  return this.features.every(function(f){return f.isValid()});
 };
 
 MultiFeature.prototype.setCoordinates = function(coords) {
@@ -51,7 +52,7 @@ MultiFeature.prototype.getCoordinate = function(path) {
 };
 
 MultiFeature.prototype.getCoordinates = function() {
-  return JSON.parse(JSON.stringify(this.features.map(f => {
+  return JSON.parse(JSON.stringify(this.features.map(function(f){
     if (f.type === Constants.geojsonTypes.POLYGON) return f.getCoordinates();
     return f.coordinates;
   })));

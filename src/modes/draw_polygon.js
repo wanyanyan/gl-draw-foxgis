@@ -15,40 +15,40 @@ module.exports = function(ctx) {
       coordinates: [[]]
     }
   });
-  let currentVertexPosition = 0;
+  var currentVertexPosition = 0;
 
   if (ctx._test) ctx._test.polygon = polygon;
 
   ctx.store.add(polygon);
 
   return {
-    start() {
+    start:function(){
       ctx.store.clearSelected();
       doubleClickZoom.disable(ctx);
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       ctx.ui.setActiveButton(Constants.types.POLYGON);
-      this.on('mousemove', CommonSelectors.true, e => {
-        polygon.updateCoordinate(`0.${currentVertexPosition}`, e.lngLat.lng, e.lngLat.lat);
+      this.on('mousemove', CommonSelectors.true, function(e){
+        polygon.updateCoordinate("0."+currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         if (CommonSelectors.isVertex(e)) {
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
         }
       });
-      this.on('click', CommonSelectors.true, (e) => {
+      this.on('click', CommonSelectors.true, function(e){
         if (currentVertexPosition > 0 && isEventAtCoordinates(e, polygon.coordinates[0][currentVertexPosition - 1])) {
           return ctx.events.changeMode(Constants.modes.STATIC, { featureIds: [polygon.id] });
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
-        polygon.updateCoordinate(`0.${currentVertexPosition}`, e.lngLat.lng, e.lngLat.lat);
+        polygon.updateCoordinate("0."+currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         currentVertexPosition++;
       });
-      this.on('click', CommonSelectors.isVertex, () => {
+      this.on('click', CommonSelectors.isVertex, function(){
         return ctx.events.changeMode(Constants.modes.STATIC, { featureIds: [polygon.id] });
       });
-      this.on('keyup', CommonSelectors.isEscapeKey, () => {
+      this.on('keyup', CommonSelectors.isEscapeKey, function(){
         ctx.store.delete([polygon.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
-      this.on('keyup', CommonSelectors.isEnterKey, () => {
+      this.on('keyup', CommonSelectors.isEnterKey, function(){
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [polygon.id] });
       });
     },
@@ -62,7 +62,7 @@ module.exports = function(ctx) {
       if (ctx.store.get(polygon.id) === undefined) return;
 
       //remove last added coordinate
-      polygon.removeCoordinate(`0.${currentVertexPosition}`);
+      polygon.removeCoordinate("0."+currentVertexPosition);
       if (polygon.isValid()) {
         ctx.map.fire(Constants.events.CREATE, {
           features: [polygon.toGeoJSON()]
@@ -74,7 +74,7 @@ module.exports = function(ctx) {
       }
     },
 
-    render(geojson, callback) {
+    render:function(geojson, callback) {
       const isActivePolygon = geojson.properties.id === polygon.id;
       geojson.properties.active = (isActivePolygon) ? Constants.activeStates.ACTIVE : Constants.activeStates.INACTIVE;
       if (!isActivePolygon) return callback(geojson);
@@ -95,8 +95,8 @@ module.exports = function(ctx) {
         // Add a start position marker to the map, clicking on this will finish the feature
         // This should only be shown when we're in a valid spot
         callback(createVertex(polygon.id, geojson.geometry.coordinates[0][0], '0.0', false));
-        let endPos = geojson.geometry.coordinates[0].length - 3;
-        callback(createVertex(polygon.id, geojson.geometry.coordinates[0][endPos], `0.${endPos}`, false));
+        var endPos = geojson.geometry.coordinates[0].length - 3;
+        callback(createVertex(polygon.id, geojson.geometry.coordinates[0][endPos], "0."+endPos, false));
       }
 
       // If we have more than two positions (plus the closer),
@@ -119,7 +119,7 @@ module.exports = function(ctx) {
         }
       });
     },
-    trash() {
+    trash:function() {
       ctx.store.delete([polygon.id], { silent: true });
       ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
     }

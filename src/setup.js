@@ -45,7 +45,7 @@ module.exports = function(ctx) {
         setup.addLayers();
         ctx.events.addEventListeners();
       } else {
-        map.on('load', () => {
+        map.on('load', function(){
           setup.addLayers();
           ctx.events.addEventListeners();
         });
@@ -70,14 +70,14 @@ module.exports = function(ctx) {
         type: 'geojson'
       });
 
-      ctx.options.styles.forEach(style => {
+      ctx.options.styles.forEach(function(style){
         ctx.map.addLayer(style);
       });
 
       ctx.store.render();
     },
     removeLayers: function() {
-      ctx.options.styles.forEach(style => {
+      ctx.options.styles.forEach(function(style){
         ctx.map.removeLayer(style.id);
       });
 

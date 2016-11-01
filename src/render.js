@@ -7,7 +7,7 @@ module.exports = function render() {
 
   var mode = store.ctx.events.currentModeName();
 
-  store.ctx.ui.queueMapClasses({ mode });
+  store.ctx.ui.queueMapClasses({ mode:mode });
 
   var newHotIds = [];
   var newColdIds = [];
@@ -15,14 +15,14 @@ module.exports = function render() {
   if (store.isDirty) {
     newColdIds = store.getAllIds();
   } else {
-    newHotIds = store.getChangedIds().filter(id => store.get(id) !== undefined);
+    newHotIds = store.getChangedIds().filter(function(id){return store.get(id) !== undefined;});
     newColdIds = store.sources.hot.filter(function getColdIds(geojson) {
       return geojson.properties.id && newHotIds.indexOf(geojson.properties.id) === -1 && store.get(geojson.properties.id) !== undefined;
-    }).map(geojson => geojson.properties.id);
+    }).map(function(geojson){return geojson.properties.id;});
   }
 
   store.sources.hot = [];
-  let lastColdCount = store.sources.cold.length;
+  var lastColdCount = store.sources.cold.length;
   store.sources.cold = store.isDirty ? [] : store.sources.cold.filter(function saveColdFeatures(geojson) {
     var id = geojson.properties.id || geojson.properties.parent;
     return newHotIds.indexOf(id) === -1;
@@ -30,13 +30,13 @@ module.exports = function render() {
 
   var coldChanged = lastColdCount !== store.sources.cold.length || newColdIds.length > 0;
 
-  newHotIds.forEach(id => renderFeature(id, 'hot'));
-  newColdIds.forEach(id => renderFeature(id, 'cold'));
+  newHotIds.forEach(function(id){ renderFeature(id, 'hot');});
+  newColdIds.forEach(function(id){ renderFeature(id, 'cold');});
 
   function renderFeature(id, source) {
     const feature = store.get(id);
     const featureInternal = feature.internal(mode);
-    store.ctx.events.currentModeRender(featureInternal, (geojson) => {
+    store.ctx.events.currentModeRender(featureInternal, function(geojson){
       store.sources[source].push(geojson);
     });
   }
@@ -55,13 +55,13 @@ module.exports = function render() {
 
   if (store._emitSelectionChange) {
     store.ctx.map.fire(Constants.events.SELECTION_CHANGE, {
-      features: store.getSelected().map(feature => feature.toGeoJSON())
+      features: store.getSelected().map(function(feature){return feature.toGeoJSON()})
     });
     store._emitSelectionChange = false;
   }
 
   if (store._deletedFeaturesToEmit.length) {
-    var geojsonToEmit = store._deletedFeaturesToEmit.map(feature => feature.toGeoJSON());
+    var geojsonToEmit = store._deletedFeaturesToEmit.map(function(feature){return feature.toGeoJSON()});
 
     store._deletedFeaturesToEmit = [];
 

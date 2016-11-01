@@ -27,10 +27,10 @@ const hideControls = {
 };
 
 function addSources(styles, sourceBucket) {
-  return styles.map(style => {
+  return styles.map(function(style){
     if (style.source) return style;
     return xtend(style, {
-      id: `${style.id}.${sourceBucket}`,
+      id: style.id+"."+sourceBucket,
       source: (sourceBucket === 'hot')
         ? Constants.sources.HOT
         : Constants.sources.COLD
@@ -38,8 +38,9 @@ function addSources(styles, sourceBucket) {
   });
 }
 
-module.exports = function(options = {}) {
-  let withDefaults = xtend(options);
+module.exports = function(options) {
+  if(options===undefined){options={};}
+  var withDefaults = xtend(options);
 
   if (!options.controls) {
     withDefaults.controls = {};

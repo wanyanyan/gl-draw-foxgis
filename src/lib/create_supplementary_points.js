@@ -2,11 +2,14 @@ const createVertex = require('./create_vertex');
 const createMidpoint = require('./create_midpoint');
 const Constants = require('../constants');
 
-function createSupplementaryPoints(geojson, options = {}, basePath = null) {
-  const { type, coordinates } = geojson.geometry;
-  let featureId = geojson.properties && geojson.properties.id;
+function createSupplementaryPoints(geojson, options, basePath) {
+  if(options===undefined){options={};}
+  if(basePath===undefined){basePath = null;}
+  const type = geojson.geometry.type;
+  const coordinates = geojson.geometry.coordinates;
+  var featureId = geojson.properties && geojson.properties.id;
 
-  let supplementaryPoints = [];
+  var supplementaryPoints = [];
 
   if (type === Constants.geojsonTypes.POINT) {
     // For points, just create a vertex
@@ -14,8 +17,8 @@ function createSupplementaryPoints(geojson, options = {}, basePath = null) {
   } else if (type === Constants.geojsonTypes.POLYGON) {
     // Cycle through a Polygon's rings and
     // process each line
-    coordinates.forEach((line, lineIndex) => {
-      processLine(line, (basePath) ? `${basePath}.${lineIndex}` : String(lineIndex));
+    coordinates.forEach(function(line, lineIndex){
+      processLine(line, (basePath) ? String(basePath[lineIndex]) : String(lineIndex));
     });
   } else if (type === Constants.geojsonTypes.LINE_STRING) {
     processLine(coordinates, basePath);
@@ -24,10 +27,10 @@ function createSupplementaryPoints(geojson, options = {}, basePath = null) {
   }
 
   function processLine(line, lineBasePath) {
-    let firstPointString = '';
-    let lastVertex = null;
-    line.forEach((point, pointIndex) => {
-      const pointPath = (lineBasePath != undefined) ? `${lineBasePath}.${pointIndex}` : String(pointIndex);
+    var firstPointString = '';
+    var lastVertex = null;
+    line.forEach(function(point, pointIndex){
+      const pointPath = (lineBasePath != undefined) ? String(lineBasePath[pointIndex]) : String(pointIndex);
       const vertex = createVertex(featureId, point, pointPath, isSelectedPath(pointPath));
 
       // If we're creating midpoints, check if there was a
@@ -62,7 +65,7 @@ function createSupplementaryPoints(geojson, options = {}, basePath = null) {
   // for each of those constituents
   function processMultiGeometry() {
     const subType = type.replace(Constants.geojsonTypes.MULTI_PREFIX, '');
-    coordinates.forEach((subCoordinates, index) => {
+    coordinates.forEach(function(subCoordinates, index){
       const subFeature = {
         type: Constants.geojsonTypes.FEATURE,
         properties: geojson.properties,

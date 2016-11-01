@@ -14,7 +14,7 @@ var ModeHandler = function(mode, DrawContext) {
   var ctx = {
     on: function(event, selector, fn) {
       if (handlers[event] === undefined) {
-        throw new Error(`Invalid event type: ${event}`);
+        throw new Error("Invalid event type: "+event);
       }
       handlers[event].push({
         selector: selector,

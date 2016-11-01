@@ -7,29 +7,30 @@ const doubleClickZoom = require('../lib/double_click_zoom');
 const moveFeatures = require('../lib/move_features');
 const Constants = require('../constants');
 
-module.exports = function(ctx, options = {}) {
-  let dragMoveLocation = null;
-  let boxSelectStartLocation = null;
-  let boxSelectElement;
-  let boxSelecting = false;
-  let canBoxSelect = false;
-  let dragMoving = false;
-  let canDragMove = false;
+module.exports = function(ctx, options) {
+  if(options===undefined){options={};}
+  var dragMoveLocation = null;
+  var boxSelectStartLocation = null;
+  var boxSelectElement;
+  var boxSelecting = false;
+  var canBoxSelect = false;
+  var dragMoving = false;
+  var canDragMove = false;
 
   const initiallySelectedFeatureIds = options.featureIds || [];
 
   const fireUpdate = function() {
     ctx.map.fire(Constants.events.UPDATE, {
       action: Constants.updateActions.MOVE,
-      features: ctx.store.getSelected().map(f => f.toGeoJSON())
+      features: ctx.store.getSelected().map(function(f){return f.toGeoJSON()})
     });
   };
 
   const getUniqueIds = function(allFeatures) {
     if (!allFeatures.length) return [];
-    const ids = allFeatures.map(s => s.properties.id)
-      .filter(id => id !== undefined)
-      .reduce((memo, id) => {
+    const ids = allFeatures.map(function(s){return s.properties.id})
+      .filter(function(id){return id !== undefined})
+      .reduce(function(memo, id){
         memo.add(id);
         return memo;
       }, new StringSet());
@@ -58,7 +59,7 @@ module.exports = function(ctx, options = {}) {
     start: function() {
       // Select features that should start selected,
       // probably passed in from a `draw_*` mode
-      if (ctx.store) ctx.store.setSelected(initiallySelectedFeatureIds.filter(id => {
+      if (ctx.store) ctx.store.setSelected(initiallySelectedFeatureIds.filter(function(id){
         return ctx.store.get(id) !== undefined;
       }));
 
@@ -73,15 +74,16 @@ module.exports = function(ctx, options = {}) {
       this.on('mousemove', CommonSelectors.true, stopExtendedInteractions);
 
       // As soon as you mouse leaves the canvas, update the feature
-      this.on('mouseout', () => dragMoving, fireUpdate);
+      this.on('mouseout', function(){return dragMoving}, fireUpdate);
 
       // Click (with or without shift) on no feature
       this.on('click', CommonSelectors.noTarget, function() {
         // Clear the re-render selection
+        var _this = this;
         const wasSelected = ctx.store.getSelectedIds();
         if (wasSelected.length) {
           ctx.store.clearSelected();
-          wasSelected.forEach(id => this.render(id));
+          wasSelected.forEach(function(id){_this.render(id)});
         }
         doubleClickZoom.enable(ctx);
         stopExtendedInteractions();
@@ -159,7 +161,7 @@ module.exports = function(ctx, options = {}) {
       });
 
       // Dragging when drag move is enabled
-      this.on('drag', () => canDragMove, function(e) {
+      this.on('drag', function(){return canDragMove}, function(e) {
         dragMoving = true;
         e.originalEvent.stopPropagation();
 
@@ -185,7 +187,7 @@ module.exports = function(ctx, options = {}) {
           ];
           const featuresInBox = featuresAt(null, bbox, ctx);
           const idsToSelect = getUniqueIds(featuresInBox)
-            .filter(id => !ctx.store.isSelected(id));
+            .filter(function(id){return !ctx.store.isSelected(id)});
 
           if (idsToSelect.length) {
             ctx.store.select(idsToSelect);
@@ -207,7 +209,7 @@ module.exports = function(ctx, options = {}) {
         });
 
         // Drag when box select is enabled
-        this.on('drag', () => canBoxSelect, function(e) {
+        this.on('drag', function(){return canBoxSelect}, function(e) {
           boxSelecting = true;
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
 
@@ -224,11 +226,11 @@ module.exports = function(ctx, options = {}) {
           const maxX = Math.max(boxSelectStartLocation.x, current.x);
           const minY = Math.min(boxSelectStartLocation.y, current.y);
           const maxY = Math.max(boxSelectStartLocation.y, current.y);
-          const translateValue = `translate(${minX}px, ${minY}px)`;
+          const translateValue = "translate("+minX+"px, "+minY+"px)";
           boxSelectElement.style.transform = translateValue;
           boxSelectElement.style.WebkitTransform = translateValue;
-          boxSelectElement.style.width = `${maxX - minX}px`;
-          boxSelectElement.style.height = `${maxY - minY}px`;
+          boxSelectElement.style.width = (maxX - minX)+"px";
+          boxSelectElement.style.height = (maxY - minY)+"px";
         });
       }
     },
@@ -241,7 +243,7 @@ module.exports = function(ctx, options = {}) {
         || geojson.geometry.type === Constants.geojsonTypes.POINT) return;
       createSupplementaryPoints(geojson).forEach(push);
     },
-    trash() {
+    trash:function() {
       ctx.store.delete(ctx.store.getSelectedIds());
     }
   };

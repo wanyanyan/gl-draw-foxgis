@@ -25,13 +25,13 @@ var Store = module.exports = function(ctx) {
  * @return {Function} renderBatch
  */
 Store.prototype.createRenderBatch = function() {
-  let holdRender = this.render;
-  let numRenders = 0;
+  var holdRender = this.render;
+  var numRenders = 0;
   this.render = function() {
     numRenders++;
   };
 
-  return () => {
+  return function(){
     this.render = holdRender;
     if (numRenders > 0) {
       this.render();
@@ -106,18 +106,20 @@ Store.prototype.add = function(feature) {
  * @param {Object} [options.silent] - If `true`, this invocation will not fire an event.
  * @return {Store} this
  */
-Store.prototype.delete = function(featureIds, options = {}) {
-  toDenseArray(featureIds).forEach(id => {
-    if (!this._featureIds.has(id)) return;
-    this._featureIds.delete(id);
-    this._selectedFeatureIds.delete(id);
+Store.prototype.delete = function(featureIds, options) {
+  if(options===undefined){options={};}
+  var _this = this;
+  toDenseArray(featureIds).forEach(function(id){
+    if (!_this._featureIds.has(id)) return;
+    _this._featureIds.delete(id);
+    _this._selectedFeatureIds.delete(id);
     if (!options.silent) {
-      if (this._deletedFeaturesToEmit.indexOf(this._features[id]) === -1) {
-        this._deletedFeaturesToEmit.push(this._features[id]);
+      if (_this._deletedFeaturesToEmit.indexOf(_this._features[id]) === -1) {
+        _this._deletedFeaturesToEmit.push(_this._features[id]);
       }
     }
-    delete this._features[id];
-    this.isDirty = true;
+    delete _this._features[id];
+    _this.isDirty = true;
   });
   return this;
 };
@@ -135,7 +137,7 @@ Store.prototype.get = function(id) {
  * @return {Array<Object>}
  */
 Store.prototype.getAll = function() {
-  return Object.keys(this._features).map(id => this._features[id]);
+  return Object.keys(this._features).map(function(id){return this._features[id]});
 };
 
 /**
@@ -145,13 +147,15 @@ Store.prototype.getAll = function() {
  * @param {Object} [options.silent] - If `true`, this invocation will not fire an event.
  * @return {Store} this
  */
-Store.prototype.select = function(featureIds, options = {}) {
-  toDenseArray(featureIds).forEach(id => {
-    if (this._selectedFeatureIds.has(id)) return;
-    this._selectedFeatureIds.add(id);
-    this._changedFeatureIds.add(id);
+Store.prototype.select = function(featureIds, options) {
+  if(options===undefined){options={};}
+  var _this = this;
+  toDenseArray(featureIds).forEach(function(id){
+    if (_this._selectedFeatureIds.has(id)) return;
+    _this._selectedFeatureIds.add(id);
+    _this._changedFeatureIds.add(id);
     if (!options.silent) {
-      this._emitSelectionChange = true;
+      _this._emitSelectionChange = true;
     }
   });
   return this;
@@ -164,13 +168,15 @@ Store.prototype.select = function(featureIds, options = {}) {
  * @param {Object} [options.silent] - If `true`, this invocation will not fire an event.
  * @return {Store} this
  */
-Store.prototype.deselect = function(featureIds, options = {}) {
-  toDenseArray(featureIds).forEach(id => {
-    if (!this._selectedFeatureIds.has(id)) return;
-    this._selectedFeatureIds.delete(id);
-    this._changedFeatureIds.add(id);
+Store.prototype.deselect = function(featureIds, options) {
+  if(options===undefined){options={};}
+  var _this = this;
+  toDenseArray(featureIds).forEach(function(id){
+    if (!_this._selectedFeatureIds.has(id)) return;
+    _this._selectedFeatureIds.delete(id);
+    _this._changedFeatureIds.add(id);
     if (!options.silent) {
-      this._emitSelectionChange = true;
+      _this._emitSelectionChange = true;
     }
   });
   return this;
@@ -182,7 +188,8 @@ Store.prototype.deselect = function(featureIds, options = {}) {
  * @param {Object} [options.silent] - If `true`, this invocation will not fire an event.
  * @return {Store} this
  */
-Store.prototype.clearSelected = function(options = {}) {
+Store.prototype.clearSelected = function(options) {
+  if(options===undefined){options={};}
   this.deselect(this._selectedFeatureIds.values(), { silent: options.silent });
   return this;
 };
@@ -195,17 +202,19 @@ Store.prototype.clearSelected = function(options = {}) {
  * @param {Object} [options.silent] - If `true`, this invocation will not fire an event.
  * @return {Store} this
  */
-Store.prototype.setSelected = function(featureIds, options = {}) {
+Store.prototype.setSelected = function(featureIds, options) {
+  if(options===undefined){options={};}
   featureIds = toDenseArray(featureIds);
 
   // Deselect any features not in the new selection
-  this.deselect(this._selectedFeatureIds.values().filter(id => {
+  this.deselect(this._selectedFeatureIds.values().filter(function(id){
     return featureIds.indexOf(id) === -1;
   }), { silent: options.silent });
 
   // Select any features in the new selection that were not already selected
-  this.select(featureIds.filter(id => {
-    return !this._selectedFeatureIds.has(id);
+  var _this = this;
+  this.select(featureIds.filter(function(id){
+    return !_this._selectedFeatureIds.has(id);
   }), { silent: options.silent });
 
   return this;
@@ -224,7 +233,10 @@ Store.prototype.getSelectedIds = function() {
  * @return {Array<Object>} Selected features.
  */
 Store.prototype.getSelected = function() {
-  return this._selectedFeatureIds.values().map(id => this.get(id));
+  var _this = this;
+  return this._selectedFeatureIds.values().map(
+    function(id){return _this.get(id)}
+  );
 };
 
 /**

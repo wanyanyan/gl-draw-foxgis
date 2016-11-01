@@ -1,4 +1,8 @@
-var {noTarget, isOfMetaType, isInactiveFeature, isShiftDown} = require('../lib/common_selectors');
+var common_selectors = require('../lib/common_selectors');
+var noTarget = common_selectors.noTarget;
+var isOfMetaType = common_selectors.isOfMetaType;
+var isInactiveFeature = common_selectors.isInactiveFeature;
+var isShiftDown = common_selectors.isShiftDown;
 var createSupplementaryPoints = require('../lib/create_supplementary_points');
 const constrainFeatureMovement = require('../lib/constrain_feature_movement');
 const doubleClickZoom = require('../lib/double_click_zoom');
@@ -29,7 +33,7 @@ module.exports = function(ctx, opts) {
   var fireUpdate = function() {
     ctx.map.fire(Constants.events.UPDATE, {
       action: Constants.updateActions.CHANGE_COORDINATES,
-      features: ctx.store.getSelected().map(f => f.toGeoJSON())
+      features: ctx.store.getSelected().map(function(f){return f.toGeoJSON()})
     });
   };
 
@@ -76,23 +80,23 @@ module.exports = function(ctx, opts) {
       this.on('mousemove', CommonSelectors.true, stopDragging);
 
       // As soon as you mouse leaves the canvas, update the feature
-      this.on('mouseout', () => dragMoving, fireUpdate);
+      this.on('mouseout', function(){return dragMoving;}, fireUpdate);
 
       this.on('mousedown', isVertex, onVertex);
       this.on('mousedown', isMidpoint, onMidpoint);
-      this.on('drag', () => canDragMove, function(e) {
+      this.on('drag', function(){return canDragMove;}, function(e) {
         dragMoving = true;
         e.originalEvent.stopPropagation();
 
-        var selectedCoords = selectedCoordPaths.map(coord_path => feature.getCoordinate(coord_path));
-        var selectedCoordPoints = selectedCoords.map(coords => ({
+        var selectedCoords = selectedCoordPaths.map(function(coord_path){return feature.getCoordinate(coord_path)});
+        var selectedCoordPoints = selectedCoords.map(function(coords){return {
           type: Constants.geojsonTypes.FEATURE,
           properties: {},
           geometry: {
             type: Constants.geojsonTypes.POINT,
             coordinates: coords
           }
-        }));
+        }});
         var delta = {
           lng: e.lngLat.lng - dragMoveLocation.lng,
           lat: e.lngLat.lat - dragMoveLocation.lat
@@ -145,10 +149,10 @@ module.exports = function(ctx, opts) {
         return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { features: [feature] });
       }
 
-      selectedCoordPaths.sort().reverse().forEach(id => feature.removeCoordinate(id));
+      selectedCoordPaths.sort().reverse().forEach(function(id){feature.removeCoordinate(id)});
       ctx.map.fire(Constants.events.UPDATE, {
         action: Constants.updateActions.CHANGE_COORDINATES,
-        features: ctx.store.getSelected().map(f => f.toGeoJSON())
+        features: ctx.store.getSelected().map(function(f){return f.toGeoJSON()})
       });
       selectedCoordPaths = [];
       if (feature.isValid() === false) {

@@ -22,8 +22,8 @@ module.exports = function(ctx) {
   };
 
   api.getFeatureIdsAt = function(point) {
-    var features = featuresAt({ point }, null, ctx);
-    return features.map(feature => feature.properties.id);
+    var features = featuresAt({point:point}, null, ctx);
+    return features.map(function(feature){return feature.properties.id});
   };
 
   api.getSelectedIds = function () {
@@ -39,7 +39,7 @@ module.exports = function(ctx) {
     var newIds = api.add(featureCollection);
     var newIdsLookup = new StringSet(newIds);
 
-    toDelete = toDelete.filter(id => !newIdsLookup.has(id));
+    toDelete = toDelete.filter(function(id){return !newIdsLookup.has(id)});
     if (toDelete.length) {
       api.delete(toDelete);
     }
@@ -49,14 +49,14 @@ module.exports = function(ctx) {
   };
 
   api.add = function (geojson) {
-    var errors = geojsonhint.hint(geojson).filter(e => e.level !== 'message');
+    var errors = geojsonhint.hint(geojson).filter(function(e){return e.level !== 'message'});
     if (errors.length) {
       throw new Error(errors[0].message);
     }
     var featureCollection = normalize(geojson);
     featureCollection = JSON.parse(JSON.stringify(featureCollection));
 
-    var ids = featureCollection.features.map(feature => {
+    var ids = featureCollection.features.map(function(feature){
       feature.id = feature.id || hat();
 
       if (feature.geometry === null) {
@@ -67,13 +67,13 @@ module.exports = function(ctx) {
         // If the feature has not yet been created ...
         var model = featureTypes[feature.geometry.type];
         if (model === undefined) {
-          throw new Error(`Invalid geometry type: ${feature.geometry.type}.`);
+          throw new Error("Invalid geometry type: "+feature.geometry.type+".");
         }
-        let internalFeature = new model(ctx, feature);
+        var internalFeature = new model(ctx, feature);
         ctx.store.add(internalFeature);
       } else {
         // If a feature of that id has already been created, and we are swapping it out ...
-        let internalFeature = ctx.store.get(feature.id);
+        var internalFeature = ctx.store.get(feature.id);
         internalFeature.properties = feature.properties;
         if (!isEqual(internalFeature.getCoordinates(), feature.geometry.coordinates)) {
           internalFeature.incomingCoords(feature.geometry.coordinates);
@@ -97,7 +97,7 @@ module.exports = function(ctx) {
   api.getAll = function() {
     return {
       type: Constants.geojsonTypes.FEATURE_COLLECTION,
-      features: ctx.store.getAll().map(feature => feature.toGeoJSON())
+      features: ctx.store.getAll().map(function(feature){return feature.toGeoJSON()})
     };
   };
 
@@ -127,7 +127,8 @@ module.exports = function(ctx) {
     return api;
   };
 
-  api.changeMode = function(mode, modeOptions = {}) {
+  api.changeMode = function(mode, modeOptions) {
+    if(modeOptions===undefined){modeOptions={};}
     // Avoid changing modes just to re-select what's already selected
     if (mode === Constants.modes.SIMPLE_SELECT && api.getMode() === Constants.modes.SIMPLE_SELECT) {
       if (stringSetsAreEqual((modeOptions.featureIds || []), ctx.store.getSelectedIds())) return api;
