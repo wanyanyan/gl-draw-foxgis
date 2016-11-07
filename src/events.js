@@ -15,8 +15,8 @@ module.exports = function(ctx) {
 
   var mouseDownInfo = {};
   var events = {};
-  var currentModeName = Constants.modes.STATIC;
-  var currentMode = ModeHandler(modes.static(ctx), ctx);
+  var currentModeName = Constants.modes.SIMPLE_SELECT;
+  var currentMode = ModeHandler(modes.simple_select(ctx), ctx);
 
   events.drag = function(event) {
     if (isClick(mouseDownInfo, {
