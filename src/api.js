@@ -157,5 +157,10 @@ module.exports = function(ctx) {
     return api;
   };
 
+  //wanyanyan 2016/11/09 设置属性
+  api.setFeatureProperty = function(featureId,name,property){
+    ctx.store.setFeatureProperty(featureId,name,property);
+    return api;
+  }
   return api;
 };
