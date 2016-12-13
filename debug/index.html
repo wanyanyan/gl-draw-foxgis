@@ -10,14 +10,14 @@
     body { margin:0; padding:0; }
     html, body, #map { height: 100%; }
     .start-draw {
-      width: 237px;
+      width: 400px;
       position: absolute;
       left :10px;
       bottom: 10px;
       background: #efefef;
     }
     .start-draw div {
-      float: right;
+      float: left;
       border: 1px solid #ccc;
       background: #ddd;
       padding: 5px;
@@ -34,9 +34,11 @@
 <body>
 <div id='map'></div>
 <div class='start-draw' >
-  <div id='start-point'>POINT</div>
-  <div id='start-line'>LINE</div>
-  <div id='start-polygon'>POLYGON</div>
+  <div id='start-point'>点</div>
+  <div id='start-line'>线</div>
+  <div id='start-polygon'>多边形</div>
+  <div id='start-triangle'>三角形</div>
+  <div id='start-rectangle'>矩形</div>
 </div>
 <div class='toggle'>
   <button id='addBtn'>add draw</button>
@@ -66,7 +68,8 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     container: 'map',
     zoom: args.zoom || 1,
     center: args.latlng || [0, 0],
-    style: 'mapbox://styles/mapbox/streets-v8'
+    /*style: 'mapbox://styles/mapbox/streets-v8'*/
+    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imdlb3dheSIsImlhdCI6MTQ4MTYwMDkwOCwiZXhwIjoxNDgyMjA1NzA4fQ.eXDG5oLwHd-0-SuK8JN994n0fH-dCTTacVPNNuxjRCQ'
   });
 
   map.addControl(new mapboxgl.Navigation({
@@ -95,6 +98,8 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startPoint = document.getElementById('start-point');
     var startLine = document.getElementById('start-line');
     var startPolygon = document.getElementById('start-polygon');
+    var startTriangle = document.getElementById('start-triangle');
+    var startRectangle = document.getElementById('start-rectangle');
 
 
     startPoint.onclick = function() {
@@ -107,6 +112,14 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
     startPolygon.onclick = function() {
       Draw.changeMode('draw_polygon');
+    };
+
+    startTriangle.onclick = function() {
+      Draw.changeMode('draw_triangle');
+    };
+
+    startRectangle.onclick = function() {
+      Draw.changeMode('draw_rectangle');
     };
 
   });

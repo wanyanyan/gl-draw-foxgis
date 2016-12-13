@@ -1,6 +1,7 @@
 var Feature = require('./feature');
 
 var Polygon = function(ctx, geojson) {
+  if(!ctx){return;}
   Feature.call(this, ctx, geojson);
   this.coordinates = this.coordinates.map(function(ring){return ring.slice(0, -1)});
 };
