@@ -86,7 +86,10 @@ function main() {
 }
 
 function log(color, message) {
-    document.getElementById('logs').innerHTML += '<div class="log dark fill-' + color + '"><p>' + message + '</p></div>';
+    var logDiv = document.getElementById('logs');
+    if(logDiv){
+        logDiv.innerHTML += '<div class="log dark fill-' + color + '"><p>' + message + '</p></div>';
+    }  
 }
 
 function getAccessToken() {
