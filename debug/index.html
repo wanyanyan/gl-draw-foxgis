@@ -39,6 +39,7 @@
   <div id='start-polygon'>多边形</div>
   <div id='start-triangle'>三角形</div>
   <div id='start-rectangle'>矩形</div>
+  <div id='start-circle'>圆</div>
 </div>
 <div class='toggle'>
   <button id='addBtn'>add draw</button>
@@ -100,6 +101,7 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startPolygon = document.getElementById('start-polygon');
     var startTriangle = document.getElementById('start-triangle');
     var startRectangle = document.getElementById('start-rectangle');
+    var startCircle = document.getElementById('start-circle');
 
 
     startPoint.onclick = function() {
@@ -120,6 +122,10 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
     startRectangle.onclick = function() {
       Draw.changeMode('draw_rectangle');
+    };
+
+    startCircle.onclick = function() {
+      Draw.changeMode('draw_circle');
     };
 
   });

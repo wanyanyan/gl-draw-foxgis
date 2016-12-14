@@ -9,6 +9,7 @@ modes[Constants.modes.DIRECT_SELECT] = require('./modes/direct_select');
 modes[Constants.modes.DRAW_POINT] = require('./modes/draw_point');
 modes[Constants.modes.DRAW_TRIANGLE] = require('./modes/draw_triangle');
 modes[Constants.modes.DRAW_RECTANGLE] = require('./modes/draw_rectangle');
+modes[Constants.modes.DRAW_CIRCLE] = require('./modes/draw_circle');
 modes[Constants.modes.DRAW_LINE_STRING] = require('./modes/draw_line_string');
 modes[Constants.modes.DRAW_POLYGON] = require('./modes/draw_polygon');
 modes[Constants.modes.STATIC] = require('./modes/static');
