@@ -48,6 +48,7 @@ module.exports = {
     DRAW_CIRCLE: 'draw_circle',
     DRAW_ARROW: 'draw_arrow',
     DRAW_ARC: 'draw_arc',
+    DRAW_BEZIER: 'draw_bezier',
     SIMPLE_SELECT: 'simple_select',
     DIRECT_SELECT: 'direct_select',
     STATIC: 'static'

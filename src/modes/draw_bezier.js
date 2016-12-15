@@ -1,12 +1,12 @@
 const CommonSelectors = require('../lib/common_selectors');
-const Arc = require('../feature_types/arc');
+const Bezier = require('../feature_types/bezier');
 const isEventAtCoordinates = require('../lib/is_event_at_coordinates');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const Constants = require('../constants');
 const createVertex = require('../lib/create_vertex');
 
 module.exports = function(ctx) {
-  const arc = new Arc(ctx, {
+  const bezier = new Bezier(ctx, {
     type: Constants.geojsonTypes.FEATURE,
     properties: {},
     geometry: {
@@ -15,11 +15,12 @@ module.exports = function(ctx) {
     }
   });
   var currentVertexPosition = 0;
-  var points = [];
+  var points_x = [];
+  var points_y = [];
 
-  if (ctx._test) ctx._test.line = arc;
+  if (ctx._test) ctx._test.line = bezier;
 
-  ctx.store.add(arc);
+  ctx.store.add(bezier);
 
   return {
     start: function() {
@@ -28,45 +29,59 @@ module.exports = function(ctx) {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       ctx.ui.setActiveButton(Constants.types.LINE);
       this.on('mousemove', CommonSelectors.true, function(e){
-        if(currentVertexPosition === 2){
-          var arcVertex = arc.getArcVertex(ctx,points[0],points[1],ctx.map.project(e.lngLat));
-          if(arcVertex){
-            arc.setCoordinates(arcVertex);
+        if(currentVertexPosition >= 2&&currentVertexPosition<4){
+          var p = ctx.map.project(e.lngLat);
+          points_x[points_x.length-1] = p.x;
+          points_y[points_y.length-1] = p.y;
+          var bezierVertex = bezier.getBezierVertex(ctx,points_x,points_y);
+          if(bezierVertex){
+            bezier.setCoordinates(bezierVertex);
           }
-        }else if(currentVertexPosition === 3){//结束
+        }else if(currentVertexPosition === 4){
           ctx.map.fire(Constants.events.CREATE, {
-            features: [arc.toGeoJSON()]
+            features: [bezier.toGeoJSON()]
           });
-          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
+          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
         }else if(currentVertexPosition === 1){
-          arc.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
+          bezier.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         }
         if (CommonSelectors.isVertex(e)) {
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
         }
       });
       this.on('click', CommonSelectors.true, function(e){
-        if(currentVertexPosition > 0 && isEventAtCoordinates(e, arc.coordinates[currentVertexPosition - 1])) {
-          return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
+        if(currentVertexPosition > 0 && isEventAtCoordinates(e, bezier.coordinates[currentVertexPosition - 1])) {
+          return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
-        if(currentVertexPosition===2){
+        if(currentVertexPosition >= 2){
+          var p = ctx.map.project(e.lngLat);
+          points_x.pop();points_y.pop();
+          points_x.push(p.x);
+          points_y.push(p.y);
+          points_x.push(0);
+          points_y.push(0);
           currentVertexPosition++;
         }else{
-          arc.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
-          points.push(ctx.map.project(e.lngLat));
+          bezier.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
+          var p = ctx.map.project(e.lngLat);
+          points_x.pop();points_y.pop();
+          points_x.push(p.x);
+          points_y.push(p.y);
+          points_x.push(0);
+          points_y.push(0);
           currentVertexPosition++;
-        } 
+        }
       });
       this.on('click', CommonSelectors.isVertex, function(){
-        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
+        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
       });
       this.on('keyup', CommonSelectors.isEscapeKey, function(){
-        ctx.store.delete([arc.id], { silent: true });
+        ctx.store.delete([bezier.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
       this.on('keyup', CommonSelectors.isEnterKey, function(){
-        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
+        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
       });
     },
 
@@ -75,23 +90,23 @@ module.exports = function(ctx) {
       ctx.ui.setActiveButton();
 
       // check to see if we've deleted this feature
-      if (ctx.store.get(arc.id) === undefined) return;
+      if (ctx.store.get(bezier.id) === undefined) return;
 
       //remove last added coordinate
-      arc.removeCoordinate(String(currentVertexPosition));
-      if (arc.isValid()) {
+      bezier.removeCoordinate(String(currentVertexPosition));
+      if (bezier.isValid()) {
         ctx.map.fire(Constants.events.CREATE, {
-          features: [arc.toGeoJSON()]
+          features: [bezier.toGeoJSON()]
         });
       }
       else {
-        ctx.store.delete([arc.id], { silent: true });
+        ctx.store.delete([bezier.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, {}, { silent: true });
       }
     },
 
     render:function(geojson, callback){
-      const isActiveLine = geojson.properties.id === arc.id;
+      const isActiveLine = geojson.properties.id === bezier.id;
       geojson.properties.active = (isActiveLine) ? Constants.activeStates.ACTIVE : Constants.activeStates.INACTIVE;
       if (!isActiveLine) return callback(geojson);
 
@@ -100,14 +115,14 @@ module.exports = function(ctx) {
       geojson.properties.meta = Constants.meta.FEATURE;
 
       /*if(geojson.geometry.coordinates.length >= 3) {
-        callback(createVertex(arc.id, geojson.geometry.coordinates[geojson.geometry.coordinates.length-2], String(geojson.geometry.coordinates.length-2), false));
+        callback(createVertex(bezier.id, geojson.geometry.coordinates[geojson.geometry.coordinates.length-2], String(geojson.geometry.coordinates.length-2), false));
       }*/
 
       callback(geojson);
     },
 
     trash:function(){
-      ctx.store.delete([arc.id], { silent: true });
+      ctx.store.delete([bezier.id], { silent: true });
       ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
     }
   };
