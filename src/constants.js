@@ -47,6 +47,7 @@ module.exports = {
     DRAW_RECTANGLE: 'draw_rectangle',
     DRAW_CIRCLE: 'draw_circle',
     DRAW_ARROW: 'draw_arrow',
+    DRAW_ARC: 'draw_arc',
     SIMPLE_SELECT: 'simple_select',
     DIRECT_SELECT: 'direct_select',
     STATIC: 'static'

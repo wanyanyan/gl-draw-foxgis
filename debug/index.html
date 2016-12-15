@@ -41,6 +41,7 @@
   <div id='start-rectangle'>矩形</div>
   <div id='start-circle'>圆</div>
   <div id='start-arrow'>箭头</div>
+  <div id='start-arc'>圆弧</div>
 </div>
 <div class='toggle'>
   <button id='addBtn'>add draw</button>
@@ -104,6 +105,7 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startRectangle = document.getElementById('start-rectangle');
     var startCircle = document.getElementById('start-circle');
     var startArrow = document.getElementById('start-arrow');
+    var startArc = document.getElementById('start-arc');
 
 
     startPoint.onclick = function() {
@@ -132,6 +134,10 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
     startArrow.onclick = function() {
       Draw.changeMode('draw_arrow');
+    };
+
+    startArc.onclick = function() {
+      Draw.changeMode('draw_arc');
     };
 
   });

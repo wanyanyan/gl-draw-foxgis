@@ -1,6 +1,7 @@
 var Feature = require('./feature');
 
 var LineString = function(ctx, geojson) {
+  if(!ctx){return;}
   Feature.call(this, ctx, geojson);
 };
 
