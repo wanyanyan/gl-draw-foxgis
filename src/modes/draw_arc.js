@@ -8,7 +8,9 @@ const createVertex = require('../lib/create_vertex');
 module.exports = function(ctx) {
   const arc = new Arc(ctx, {
     type: Constants.geojsonTypes.FEATURE,
-    properties: {},
+    properties: {
+      type:Constants.featureTypes.ARC
+    },
     geometry: {
       type: Constants.geojsonTypes.LINE_STRING,
       coordinates: []

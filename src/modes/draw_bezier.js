@@ -15,6 +15,7 @@ module.exports = function(ctx) {
     }
   });
   var currentVertexPosition = 0;
+  //每点击一次，获取点击的坐标，x、y分开存储
   var points_x = [];
   var points_y = [];
 
@@ -29,7 +30,7 @@ module.exports = function(ctx) {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       ctx.ui.setActiveButton(Constants.types.LINE);
       this.on('mousemove', CommonSelectors.true, function(e){
-        if(currentVertexPosition >= 2&&currentVertexPosition<4){
+        if(currentVertexPosition >= 2&&currentVertexPosition<4){//大于两个点时计算Bezier曲线
           var p = ctx.map.project(e.lngLat);
           points_x[points_x.length-1] = p.x;
           points_y[points_y.length-1] = p.y;
@@ -37,7 +38,7 @@ module.exports = function(ctx) {
           if(bezierVertex){
             bezier.setCoordinates(bezierVertex);
           }
-        }else if(currentVertexPosition === 4){
+        }else if(currentVertexPosition === 4){//四个点时绘制完毕
           ctx.map.fire(Constants.events.CREATE, {
             features: [bezier.toGeoJSON()]
           });

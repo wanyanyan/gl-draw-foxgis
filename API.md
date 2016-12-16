@@ -1,13 +1,13 @@
-# API Reference
+# API 参考
 
-To use Draw
+使用方法
 
 ```js
 var Draw = mapboxgl.Draw({ options });
 map.addControl(Draw);
 ```
 
-Draw only works after the map has loaded so it is wise to perform any interactions in the `load` event callback of mapbox-gl:
+只有在地图加载完才能使用Draw，因此最好在mapbox-gl地图的 `load` 事件回调中添加Draw的交互:
 
 ```js
 map.on('load', function() {
@@ -17,88 +17,126 @@ map.on('load', function() {
 });
 ```
 
-## Options
+## Options选项
 
-option | values | function
+选项 | 类型 | 功能
 --- | --- | ---
-drawing | boolean | The ability to draw and delete features - default: `true`
-keybindings | boolean | Keyboard shortcuts for drawing - default: `true`
+drawing | boolean | 是否允许绘制和删除要素 - 默认: `true`
+keybindings | boolean | 为绘图绑定快捷键 - 默认: `true`
 boxSelect | boolean | If true, shift + click to features. If false, click + select zooms to area - default: `true`
-clickBuffer | number | On click, include features beyond the coordinates of the click by clickBuffer value all directions - default: `2`
-displayControlsDefault | boolean | Sets default value for the control keys in the control option - default `true`
-controls | Object | Lets you hide or show individual controls. See `displayControlsDefault` for default. Available options are: point, line, polygon and trash.
-styles | Array | An array of style objects. By default draw provides a style for you. To override this see [Styling Draw](#styling-draw) further down.
+clickBuffer | number | 鼠标点击时选取要素的缓冲区 - 默认: `2`
+displayControlsDefault | boolean | 设置控制选项的默认值 - default `true`
+controls | Object | 自定义控制按钮. 从 `displayControlsDefault` 中获得默认值. 可选的值有: point, line, polygon, trash.
+styles | Array | 样式对象的数组. 默认情况Draw会提供一个默认的样式，如果要覆盖默认样式，可参考[Styling Draw](#styling-draw).
 
-## Modes
+## 模式
 
-The modes names are available as an enum at `Draw.modes`.
+模式名称作为枚举类存储在 `Draw.modes`中。
 
 ### `simple_select`
 
 `Draw.modes.SIMPLE_SELECT === 'simple_select'`
 
-Lets you select, delete and drag features.
+允许选择、删除和移动要素。
 
 In this mode, features can have their active state changed by the user. To control what is active, react to changes as described in the events section below.
 
-Draw will transition into `simple_select` mode every time a single feature has completed drawing.
+每次单个要素绘制完成以后会自动进入 `simple_select` 模式.
 
 ### `direct_select`
 
 `Draw.modes.DIRECT_SELECT === 'direct_select'`
 
-Lets you select, delete and drag vertices.
+该模式下可以选择、删除和移动要素的节点。
 
-`direct_select` mode doesn't handle point features.
+点状要素不具有`direct_select` 模式。
 
 ### `draw_line_string`
 
 `Draw.modes.DRAW_LINE_STRING === 'draw_line_string'`
 
-Lets you draw a LineString feature.
+绘制普通线状要素
 
 ### `draw_polygon`
 
 `Draw.modes.DRAW_POLYGON === 'draw_polygon'`
 
-Lets you draw a Polygon feature.
+绘制一个普通面状要素
 
 ### `draw_point`
 
 `Draw.modes.DRAW_POINT === 'draw_point'`
 
-Lets you draw a Point feature.
+绘制一个点状要素
+
+### `draw_arc`
+
+`Draw.modes.DRAW_ARC === 'draw_arc'`
+
+三点画弧
+
+### `draw_arrow`
+
+`Draw.modes.DRAW_ARROW === 'draw_arrow'`
+
+绘制一个趋势箭头
+
+### `draw_bezier`
+
+`Draw.modes.DRAW_BEZIER === 'draw_bezier'`
+
+四点绘制贝塞尔曲线
+
+### `draw_circle`
+
+`Draw.modes.DRAW_CIRCLE === 'draw_circle'`
+
+通过一个点和半径画一个圆
+
+### `draw_rectangle`
+
+`Draw.modes.DRAW_RECTANGLE === 'draw_retangle'`
+
+画一个矩形
+
+### `draw_TRIANGLE`
+
+`Draw.modes.DRAW_triangle === 'draw_triangle'`
+
+画一个三角形
 
 ### `static`
 
 `Draw.modes.STATIC === 'static'`
 
-Disables editing for all drawn features. It does not take an options argument.
+该模式下所有绘制的要素都禁止编辑，该模式不具备任何可传递的参数。
 
-Note that this mode can only be entered or exited via `.changeMode`
+注意：该模式只能通过调用 `.changeMode` 函数进入或退出。
 
-## API Methods
+## API 方法
 
-`mapboxgl.Draw()` returns an instance of `Draw` which has the following API for working with your data:
+`mapboxgl.Draw()` 返回一个 `Draw` 实例，该实例具有以下API方法:
 
 ###`.add(Object: GeoJSON) -> [String]`
 
-This method takes either a Feature or a FeatureCollection and adds it to Draw. It returns an array of ids for interacting with the added features.
+将一个geojson要素添加到地图上
+输入参数：geojson类型的要素(feature)或要素集(featurecollection)
+返回值：包含所添加要素id的数组
 
-Currently the supported GeoJSON feature types are `Point`, `LineString`, `Polygon`, `MultiPoint`,  `MultiLineString`, and `MultiPolygon`.
+目前支持的geojson要素类型有 `Point`, `LineString`, `Polygon`, `MultiPoint`,  `MultiLineString`,  `MultiPolygon`.
 
-Adding a feature with the same id as another feature performs an update.
+如果输入的要素id与一个已存在的要素id相同，则会更新已存在的要素。
 
-Example:
+示例:
 
 ```js
 var feature = { type: 'Point', coordinates: [0, 0] };
 var featureId = Draw.add(feature);
 console.log(featureId);
-//=> 'random-string'
+//=> '随机生成的字符串'
 ```
 
-Example with ID:
+示例（包含id）:
 
 ```js
 var feature = { type: 'Point', coordinates: [0, 0], id: 'unique-id' };
@@ -107,12 +145,11 @@ console.log(featureId)
 //=> unique-id
 ```
 
----
 ###`.get(String: featureId) -> Object`
 
-This method takes an ID returns a GeoJSON feature.
+输入id，返回对应的geojson要素
 
-Example:
+示例:
 
 ```js
 var id = Draw.add({ type: 'Point', coordinates: [0, 0] });
@@ -120,32 +157,24 @@ console.log(Draw.get(id));
 //=> { type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] } }
 ```
 
----
 ### `.getFeatureIdsAt(Object: point) -> [featureId, featuresId]`
 
-This method takes an object with x and y and returns a list of
-features currently rendered by draws at that spot.
-
-This is good for using mouse events to get information out of draw.
-
-x and y must be from from pixel space, not latitude and longitude.
+给定一个具有x、y属性的点，返回该点范围内所有绘制的要素id。x和y的值为像素坐标，不是经纬度。
 
 ```js
 var featureIds = Draw.getFeatureIdsAt(20, 20);
 console.log(featureIds)
 //=> ['top-feature-at-20-20', 'another-feature-at-20-20']
 ```
----
 ### `.getSelectedIds() -> [featureId, featuresId]`
 
-This method returns the feature ids for all features currently in a selected state. If no features are currently selected than it will return an empty array.
+返回所有处于选中状态的要素id，如果没有要素被选中，则返回空数组。
 
----
 ###`.getAll() -> Object`
 
-This method returns all features added to Draw in a single GeoJSON FeatureCollection.
+以geojson要素集的形式返回所有绘制的要素。
 
-Example:
+示例:
 
 ```js
 Draw.add({ type: 'Point', coordinates: [0, 0] });
@@ -182,15 +211,14 @@ console.log(Draw.getAll());
 //  ]
 //}
 ```
----
 
 ###`.delete(String | Array<String> : id) -> Draw`
 
-This method takes an id or an array of ids and removes the corresponding features from Draw.
+给定一个id或者一个包含多个id的数组，删除对应id的要素。
 
-In `direct_select` mode, deleting the active feature will stop the mode and revert to the `simple_select` mode.
+在 `direct_select` 模式，删除选中的要素会退出该模式，返回到 `simple_select` 模式
 
-Example:
+示例:
 
 ```js
 var feature = { type: 'Point', coordinates: [0, 0] };
@@ -205,9 +233,9 @@ Draw
 
 ###`.deleteAll() -> Draw`
 
-This method removes all geometries in Draw.
+删除绘制的所有要素
 
-Example:
+示例:
 
 ```js
 Draw.add({ type: 'Point', coordinates: [0, 0] });
@@ -221,9 +249,9 @@ Draw
 
 ### `.set(Object: featureCollection) -> [featureId, featureId]`
 
-This function takes a featureCollection and performs the required delete, create and update actions internally to make Draw represent this change. Effectively this is the same as `Draw.deleteAll()` followed by `Draw.add(featureCollection)` except that it doesn't effect performance as much.
+给定一个geojson要素集，将地图上绘制的要素重置为该要素集。从效果上来说，相当于执行 `Draw.deleteAll()` 然后再调用 `Draw.add(featureCollection)`。
 
-Example:
+示例:
 
 ```js
 var ids = Draw.set({type: 'FeatureCollection', features: [{
@@ -239,32 +267,32 @@ var ids = Draw.set({type: 'FeatureCollection', features: [{
 
 ### `.trash() -> Draw`
 
-This envokes the current modes trash event. For the `simple_select` mode this deletes all active features. For the `direct_select` mode this deletes the active vertices. For the drawing modes, these cancel the current process.
+触发当前模式下的trash事件，在 `simple_select` 模式下会删除所有选中的要素，在 `direct_select` 模式下会删除所有选中的节点，在绘图模式下会取消当前的绘图进程。
 
-This is different from `delete` or `deleteAlll` in that it follows rules described by the current mode.
+与`delete` 或 `deleteAlll` 不同的是，该方法遵循在不同模式下定义的不同规则。
 
 ---
 
 ### `.getMode() -> Draw`
 
-Returns Draw's current mode. For more about the modes, see below.
+返回当前的模式
 
 ### `.changeMode(String: mode, ?Object: options) -> Draw`
 
-`changeMode` triggers the mode switching process inside Draw. `mode` must be one of the below strings. `simple_select` and `direct_select` modes accept an `options` object.
+`changeMode` 触发模式切换进程， `mode` 只能是指定字符串中的一个， `simple_select` 模式和 `direct_select` 模式可以接受一个 `options` 对象作为参数。
 
 ```js
-// `simple_select` options
+// `simple_select`模式的options参数
 {
-  // Array of ids of features that will be initially selected
+  // 指定的这些要素将会被初始化选中
   featureIds: Array<string>
 }
 ```
 
 ```js
-// `direct_select` options
+// `direct_select`模式的options参数
 {
-  // The id of the feature that is directly selected (required)
+  // 指定的要素将会在编辑状态下选中
   featureId: string
 }
 ```

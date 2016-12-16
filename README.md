@@ -1,26 +1,22 @@
 # mapbox-gl-draw.js
 
-Adds support for drawing and editing features on [mapbox-gl.js](https://www.mapbox.com/mapbox-gl-js/) maps.
+基于 [mapbox-gl-draw](https://github.com/mapbox/mapbox-gl-draw) 0.11.19版本修改，支持在 [mapbox-gl.js](https://www.mapbox.com/mapbox-gl-js/) 地图中添加和编辑要素，除了添加点、线、面以外，支持在地图上绘制曲线、圆弧、圆、矩形、箭头等形状.
 
-[![Circle CI](https://circleci.com/gh/mapbox/mapbox-gl-draw/tree/master.svg?style=svg)](https://circleci.com/gh/mapbox/gl-draw/tree/master)
-
-**All versions below 0.6.0 are no longer supported**
-
-### Installing
+### 安装
 
 ```
-npm install mapbox-gl-draw
+npm install wanyanyan/gl-draw-foxgis
 ```
 
-Require or include `mapbox-gl-draw` after `mapbox-gl`.
+在 `mapbox-gl` 之后添加或包含 `gl-draw-foxgis` .
 
-Also include [mapbox-gl-draw.css](https://github.com/mapbox/mapbox-gl-draw/blob/dev-pages/dist/mapbox-gl-draw.css)
+同时也需要添加 [gl-draw-foxgis.css](https://github.com/wanyanyan/gl-draw-foxgis/blob/master/dist/mapbox-gl-draw.css)的引用
 
 ```html
-<link href="mapbox-gl-draw.css" rel="stylesheet" />
+<link href="gl-draw-foxgis.css" rel="stylesheet" />
 ```
 
-### Usage in your application
+### 在应用程序中使用
 
 ```js
 mapboxgl.accessToken = 'YOUR_ACCESS_TOKEN';
@@ -37,19 +33,19 @@ var Draw = mapboxgl.Draw();
 map.addControl(Draw)
 ```
 
-### See [API.md](https://github.com/mapbox/mapbox-gl-draw/blob/master/API.md) for complete reference.
+### 可以从 [API.md](https://github.com/wanyanyan/gl-draw-foxgis/blob/master/API.md) 获得完整的API参考.
 
-### Developing and testing
+### 开发或测试
 
-Install dependencies, build the source files and crank up a server via:
+安装所有依赖项, 编译源文件并启动测试服务:
 
 ```
-git clone git@github.com:mapbox/mapbox-gl-draw.git
+git clone git@github.com:wanyanyan/gl-draw-foxgis.git
 npm install
 npm start & open http://localhost:9966/debug/?access_token=<token>
 ```
 
-### Testing
+### 运行测试
 
 ```
 npm run test

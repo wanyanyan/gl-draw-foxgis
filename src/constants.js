@@ -70,6 +70,17 @@ module.exports = {
     MIDPOINT: 'midpoint',
     VERTEX: 'vertex'
   },
+  featureTypes: {
+    LINE: 'line',
+    POLYGON: 'polygon',
+    POINT: 'point',
+    ARC:'arc',
+    ARROW:'arrow',
+    BEZIER:'bezier',
+    CIRCLE:'circle',
+    RECTANGLE:'rectangle',
+    TRIANGLE:'triangle'
+  },
   activeStates: {
     ACTIVE: 'true',
     INACTIVE: 'false'

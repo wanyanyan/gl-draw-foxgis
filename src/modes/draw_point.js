@@ -6,7 +6,9 @@ module.exports = function(ctx) {
 
   const point = new Point(ctx, {
     type: Constants.geojsonTypes.FEATURE,
-    properties: {},
+    properties: {
+      type:Constants.featureTypes.POINT
+    },
     geometry: {
       type: Constants.geojsonTypes.POINT,
       coordinates: []

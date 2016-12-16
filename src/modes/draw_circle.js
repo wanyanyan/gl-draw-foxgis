@@ -9,7 +9,9 @@ module.exports = function(ctx) {
 
   const circle = new Circle(ctx, {
     type: Constants.geojsonTypes.FEATURE,
-    properties: {},
+    properties: {
+      type:Constants.featureTypes.CIRCLE
+    },
     geometry: {
       type: Constants.geojsonTypes.POLYGON,
       coordinates: [[]]

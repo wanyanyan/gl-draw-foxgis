@@ -9,7 +9,9 @@ module.exports = function(ctx) {
 
   const polygon = new Polygon(ctx, {
     type: Constants.geojsonTypes.FEATURE,
-    properties: {},
+    properties: {
+      type:Constants.featureTypes.POLYGON
+    },
     geometry: {
       type: Constants.geojsonTypes.POLYGON,
       coordinates: [[]]

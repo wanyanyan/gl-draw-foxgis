@@ -76,7 +76,7 @@ module.exports = function(ctx, options) {
       // As soon as you mouse leaves the canvas, update the feature
       this.on('mouseout', function(){return dragMoving}, fireUpdate);
 
-      // Click (with or without shift) on no feature
+      // 地图上（没有要素）的点击事件
       this.on('click', CommonSelectors.noTarget, function() {
         // Clear the re-render selection
         var _this = this;
@@ -89,7 +89,7 @@ module.exports = function(ctx, options) {
         stopExtendedInteractions();
       });
 
-      // Click (with or without shift) on a vertex
+      // 顶点上的点击事件
       this.on('click', CommonSelectors.isOfMetaType(Constants.meta.VERTEX), function(e) {
         // Enter direct select mode
         ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
@@ -100,7 +100,7 @@ module.exports = function(ctx, options) {
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
       });
 
-      // Mousedown on a selected feature
+      // 选中要素的mousedown事件
       this.on('mousedown', CommonSelectors.isActiveFeature, function(e) {
         // Stop any already-underway extended interactions
         stopExtendedInteractions();
@@ -116,18 +116,22 @@ module.exports = function(ctx, options) {
         dragMoveLocation = e.lngLat;
       });
 
-      // Click (with or without shift) on any feature
+      // 所有要素上的点击事件
       this.on('click', CommonSelectors.isFeature, function(e) {
-        // Stop everything
-        doubleClickZoom.disable(ctx);
-        stopExtendedInteractions();
-
         const isShiftClick = CommonSelectors.isShiftDown(e);
+        const isCustomFeature = CommonSelectors.isCustomFeature(e);
         const selectedFeatureIds = ctx.store.getSelectedIds();
         const featureId = e.featureTarget.properties.id;
         const isFeatureSelected = ctx.store.isSelected(featureId);
 
-        // Click (without shift) on any selected feature but a point
+        if(!isShiftClick && isFeatureSelected && isCustomFeature){
+          return;
+        }
+
+        // Stop everything
+        doubleClickZoom.disable(ctx);
+        stopExtendedInteractions();
+        // 没有按shift，点击一个选中的要素，进入direct_select
         if (!isShiftClick && isFeatureSelected && ctx.store.get(featureId).type !== Constants.geojsonTypes.POINT) {
           // Enter direct select mode
           return ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
@@ -135,7 +139,7 @@ module.exports = function(ctx, options) {
           });
         }
 
-        // Shift-click on a selected feature
+        // 按住shift，点击一个选中的要素，取消选中
         if (isFeatureSelected && isShiftClick) {
           // Deselect it
           ctx.store.deselect(featureId);
@@ -143,12 +147,12 @@ module.exports = function(ctx, options) {
           if (selectedFeatureIds.length === 1 ) {
             doubleClickZoom.enable(ctx);
           }
-        // Shift-click on an unselected feature
+        // 按住shift，点击一个未选中的要素，执行选中
         } else if (!isFeatureSelected && isShiftClick) {
           // Add it to the selection
           ctx.store.select(featureId);
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
-        // Click (without shift) on an unselected feature
+        // 没有按shift，点击一个未选中的要素，切换选中要素
         } else if (!isFeatureSelected && !isShiftClick) {
           // Make it the only selected feature
           selectedFeatureIds.forEach(this.render);
@@ -241,7 +245,11 @@ module.exports = function(ctx, options) {
       push(geojson);
       if (geojson.properties.active !== Constants.activeStates.ACTIVE
         || geojson.geometry.type === Constants.geojsonTypes.POINT) return;
-      createSupplementaryPoints(geojson).forEach(push);
+      if(geojson.properties.type===Constants.featureTypes.POINT
+        ||geojson.properties.type===Constants.featureTypes.LINE
+        ||geojson.properties.type===Constants.featureTypes.POLYGON){
+        createSupplementaryPoints(geojson).forEach(push);
+      }  
     },
     trash:function() {
       ctx.store.delete(ctx.store.getSelectedIds());
