@@ -52,6 +52,31 @@
 .mapboxgl-map.mouse-move .mapboxgl-canvas-container.mapboxgl-interactive {
   cursor: move;
 }
+
+.mapboxgl-map.mouse-e-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: e-resize;
+}
+.mapboxgl-map.mouse-w-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: w-resize;
+}
+.mapboxgl-map.mouse-s-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: s-resize;
+}
+.mapboxgl-map.mouse-n-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: n-resize;
+}
+ .mapboxgl-map.mouse-ne-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: ne-resize;
+}
+.mapboxgl-map.mouse-nw-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: nw-resize;
+} 
+.mapboxgl-map.mouse-se-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: se-resize;
+} 
+.mapboxgl-map.mouse-sw-resize .mapboxgl-canvas-container.mapboxgl-interactive {
+  cursor: sw-resize;
+} 
 .mapboxgl-map.mouse-add .mapboxgl-canvas-container.mapboxgl-interactive {
   cursor: crosshair;
 }

@@ -5,7 +5,9 @@ var render = require('./render');
 
 var Store = module.exports = function(ctx) {
   this._features = {};
+  this._controlFeatures = {};
   this._featureIds = new StringSet();
+  this._controlFeatureIds = new StringSet();
   this._selectedFeatureIds = new StringSet();
   this._changedFeatureIds = new StringSet();
   this._deletedFeaturesToEmit = [];
@@ -97,6 +99,19 @@ Store.prototype.add = function(feature) {
 };
 
 /**
+ * Adds a feature to the store.
+ * @param {Object} feature
+ *
+ * @return {Store} this
+ */
+Store.prototype.addControlFeature = function(feature) {
+  //this.featureChanged(feature.id);
+  this._controlFeatures[feature.properties.parentId] = feature;
+  this._controlFeatureIds.add(feature.properties.parentId);
+  return this;
+};
+
+/**
  * Deletes a feature or array of features from the store.
  * Cleans up after the deletion by deselecting the features.
  * If changes were made, sets the state to the dirty
@@ -130,6 +145,14 @@ Store.prototype.delete = function(featureIds, options) {
  */
 Store.prototype.get = function(id) {
   return this._features[id];
+};
+
+/**
+ * 通过要素的id获得其控制点
+ * @return {Object | undefined} 控制要素
+ */
+Store.prototype.getControlFeatureById = function(id) {
+  return this._controlFeatures[id];
 };
 
 /**

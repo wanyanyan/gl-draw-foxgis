@@ -5,7 +5,8 @@ var Constants = require('../constants');
 var META_TYPES = [
   Constants.meta.FEATURE,
   Constants.meta.MIDPOINT,
-  Constants.meta.VERTEX
+  Constants.meta.VERTEX,
+  Constants.meta.CONTROL
 ];
 
 // Requires either event or bbox

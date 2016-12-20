@@ -16,8 +16,8 @@
     "lint": "eslint --no-eslintrc -c .eslintrc index.js src test",
     "tape": "tape -r ./test/mock-browser.js -r babel-register test/*.test.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter html npm run tape && opener coverage/index.html",
-    "build": "cross-env NODE_ENV=production browserify index.js > dist/mapbox-gl-draw.js",
-    "prepublish": "cross-env NODE_ENV=production browserify index.js | uglifyjs -c -m > dist/mapbox-gl-draw.js",
+    "build": "cross-env NODE_ENV=production browserify index.js > dist/gl-draw-foxgis.js",
+    "prepublish": "cross-env NODE_ENV=production browserify index.js | uglifyjs -c -m > dist/gl-draw-foxgis.js",
     "start": "node server.js"
   },
   "repository": {

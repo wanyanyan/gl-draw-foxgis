@@ -2,10 +2,12 @@ const CommonSelectors = require('../lib/common_selectors');
 const mouseEventPoint = require('../lib/mouse_event_point');
 const featuresAt = require('../lib/features_at');
 const createSupplementaryPoints = require('../lib/create_supplementary_points');
+const createControlFeature = require('../lib/create_control_feature');
 const StringSet = require('../lib/string_set');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const moveFeatures = require('../lib/move_features');
 const Constants = require('../constants');
+var geojsonExtent = require('geojson-extent');
 
 module.exports = function(ctx, options) {
   if(options===undefined){options={};}
@@ -73,6 +75,12 @@ module.exports = function(ctx, options) {
       // the mouse button that whole time
       this.on('mousemove', CommonSelectors.true, stopExtendedInteractions);
 
+      //鼠标在bbox的控制点上，改变鼠标样式，表示可拉伸
+      this.on('mousemove', CommonSelectors.isOfMetaType(Constants.meta.CONTROL), function(e){
+        var location = e.featureTarget.properties.location;
+        ctx.ui.queueMapClasses({ mouse: Constants.cursors[location] });
+      });
+
       // As soon as you mouse leaves the canvas, update the feature
       this.on('mouseout', function(){return dragMoving}, fireUpdate);
 
@@ -124,6 +132,7 @@ module.exports = function(ctx, options) {
         const featureId = e.featureTarget.properties.id;
         const isFeatureSelected = ctx.store.isSelected(featureId);
 
+        //自定义要素没有direct_select模式
         if(!isShiftClick && isFeatureSelected && isCustomFeature){
           return;
         }
@@ -239,15 +248,20 @@ module.exports = function(ctx, options) {
       }
     },
     render: function(geojson, push) {
-      geojson.properties.active = (ctx.store.isSelected(geojson.properties.id) )
-        ? Constants.activeStates.ACTIVE
-        : Constants.activeStates.INACTIVE;
+      if(ctx.store.isSelected(geojson.properties.id)){
+        geojson.properties.active = Constants.activeStates.ACTIVE;
+        if(geojson.geometry.type === Constants.geojsonTypes.POLYGON){
+          var bbox = geojsonExtent(geojson);
+          createControlFeature(ctx,bbox,geojson.properties.id).forEach(push);
+        }
+      }else{
+        geojson.properties.active = Constants.activeStates.INACTIVE;
+      }
       push(geojson);
       if (geojson.properties.active !== Constants.activeStates.ACTIVE
         || geojson.geometry.type === Constants.geojsonTypes.POINT) return;
       if(geojson.properties.type===Constants.featureTypes.POINT
-        ||geojson.properties.type===Constants.featureTypes.LINE
-        ||geojson.properties.type===Constants.featureTypes.POLYGON){
+        ||geojson.properties.type===Constants.featureTypes.LINE){
         createSupplementaryPoints(geojson).forEach(push);
       }  
     },

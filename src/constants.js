@@ -21,6 +21,14 @@ module.exports = {
     MOVE: 'move',
     DRAG: 'drag',
     POINTER: 'pointer',
+    E:'e-resize',
+    S:'s-resize',
+    W:'w-resize',
+    N:'n-resize',
+    NE:'ne-resize',
+    SE:'se-resize',
+    NW:'nw-resize',
+    SW:'sw-resize',
     NONE: 'none'
   },
   types: {
@@ -68,7 +76,8 @@ module.exports = {
   meta: {
     FEATURE: 'feature',
     MIDPOINT: 'midpoint',
-    VERTEX: 'vertex'
+    VERTEX: 'vertex',
+    CONTROL: 'control'
   },
   featureTypes: {
     LINE: 'line',

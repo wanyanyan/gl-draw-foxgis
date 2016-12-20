@@ -99,9 +99,9 @@ In this mode, features can have their active state changed by the user. To contr
 
 画一个矩形
 
-### `draw_TRIANGLE`
+### `draw_triangle`
 
-`Draw.modes.DRAW_triangle === 'draw_triangle'`
+`Draw.modes.DRAW_TRIANGLE === 'draw_triangle'`
 
 画一个三角形
 
