@@ -6,6 +6,7 @@ const createControlFeature = require('../lib/create_control_feature');
 const StringSet = require('../lib/string_set');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const moveFeatures = require('../lib/move_features');
+const transformFeatures = require('../lib/transform_features');
 const Constants = require('../constants');
 var geojsonExtent = require('geojson-extent');
 
@@ -18,6 +19,9 @@ module.exports = function(ctx, options) {
   var canBoxSelect = false;
   var dragMoving = false;
   var canDragMove = false;
+  var transformTarget = null
+
+  var location = '';
 
   const initiallySelectedFeatureIds = options.featureIds || [];
 
@@ -52,6 +56,8 @@ module.exports = function(ctx, options) {
     canBoxSelect = false;
     dragMoving = false;
     canDragMove = false;
+    location = '';
+    transformTarget = null;
   };
 
   return {
@@ -108,8 +114,13 @@ module.exports = function(ctx, options) {
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
       });
 
-      // 选中要素的mousedown事件
-      this.on('mousedown', CommonSelectors.isActiveFeature, function(e) {
+      // mousedown事件
+      this.on('mousedown', CommonSelectors.true, function(e) {
+        var isActiveFeature = CommonSelectors.isActiveFeature(e);
+        var isControlPoint = CommonSelectors.isOfMetaType(Constants.meta.CONTROL)(e);
+        if(!isActiveFeature&&!isControlPoint){
+          return;
+        }
         // Stop any already-underway extended interactions
         stopExtendedInteractions();
 
@@ -117,10 +128,17 @@ module.exports = function(ctx, options) {
         ctx.map.dragPan.disable();
 
         // Re-render it and enable drag move
-        this.render(e.featureTarget.properties.id);
+        //this.render(e.featureTarget.properties.id);
 
         // Set up the state for drag moving
         canDragMove = true;
+          
+        if(isControlPoint){
+          var id = e.featureTarget.properties.parent;
+          location = e.featureTarget.properties.location;
+          transformTarget = ctx.store.get(id);
+        }
+        
         dragMoveLocation = e.lngLat;
       });
 
@@ -177,13 +195,111 @@ module.exports = function(ctx, options) {
       this.on('drag', function(){return canDragMove}, function(e) {
         dragMoving = true;
         e.originalEvent.stopPropagation();
+        var end = ctx.map.project(e.lngLat);
+        var start = ctx.map.project(dragMoveLocation);
 
         const delta = {
-          lng: e.lngLat.lng - dragMoveLocation.lng,
-          lat: e.lngLat.lat - dragMoveLocation.lat
+          x: end.x - start.x,
+          y: end.y - start.y
         };
+        //构造变换矩阵
+        var matrix = new Array(new Array(1,0,0),new Array(0,1,0),new Array(0,0,1));
 
-        moveFeatures(ctx.store.getSelected(), delta);
+        if(transformTarget&&location){
+          var bbox = geojsonExtent(transformTarget.toGeoJSON());
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors[location] });
+          switch(location)
+          {
+          case 'E':
+            var sw = ctx.map.project([bbox[0],bbox[1]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2sw = end.x-sw.x;//鼠标x离左下角的距离
+            var start2sw = start.x-sw.x;//起点x离左下角的距离
+            if( start2sw < 1 ){ start2sw = 1; }
+            if( end2sw < 1 ){ end2sw = 1; }
+            var scale = end2sw/start2sw;//缩放倍数
+            matrix[0][0] = scale;
+            matrix[0][2] = (1-scale)*sw.x;
+            break;
+          case 'S':
+            var nw = ctx.map.project([bbox[0],bbox[3]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2nw = end.y-nw.y;//鼠标离左下角的距离
+            var start2nw = start.y-nw.y;//起点离左下角的距离
+            if( start2nw < 1 ){ start2nw = 1; }
+            if( end2nw < 1 ){ end2nw = 1; }
+            var scale = end2nw/start2nw;//缩放倍数
+            matrix[1][1] = scale;
+            matrix[1][2] = (1-scale)*nw.y;
+            break;
+          case 'W':
+            var se = ctx.map.project([bbox[2],bbox[1]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2se = end.x-se.x;//鼠标离左下角的距离
+            var start2se = start.x-se.x;//起点离左下角的距离
+            if( start2se > -1 ){ start2se = -1; }
+            if( end2se > -1 ){ end2se = -1; }
+            var scale = end2se/start2se;//缩放倍数
+            matrix[0][0] = scale;
+            matrix[0][2] = (1-scale)*se.x;
+            break;
+          case 'N':
+            var se = ctx.map.project([bbox[2],bbox[1]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2se = end.y-se.y;//鼠标离左下角的距离
+            var start2se = start.y-se.y;//起点离左下角的距离
+            if( start2se > -1 ){ start2se = -1; }
+            if( end2se > -1 ){ end2se = -1; }
+            var scale = end2se/start2se;//缩放倍数
+            matrix[1][1] = scale;
+            matrix[1][2] = (1-scale)*se.y;
+            break;
+          case 'NE':
+            var sw = ctx.map.project([bbox[0],bbox[1]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2sw = (end.x-sw.x)*(end.x-sw.x)+(end.y-sw.y)*(end.y-sw.y);//鼠标离左下角的距离
+            var start2sw = (start.x-sw.x)*(start.x-sw.x)+(start.y-sw.y)*(start.y-sw.y);//起点离左下角的距离
+            var scale = Math.sqrt(end2sw/start2sw);//缩放倍数
+            matrix[0][0] = scale;
+            matrix[1][1] = scale;
+            matrix[0][2] = (1-scale)*sw.x;
+            matrix[1][2] = (1-scale)*sw.y;
+            break;
+          case 'SE':
+            var nw = ctx.map.project([bbox[0],bbox[3]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2nw = (end.x-nw.x)*(end.x-nw.x)+(end.y-nw.y)*(end.y-nw.y);//鼠标离左下角的距离
+            var start2nw = (start.x-nw.x)*(start.x-nw.x)+(start.y-nw.y)*(start.y-nw.y);//起点离左下角的距离
+            var scale = Math.sqrt(end2nw/start2nw);//缩放倍数
+            matrix[0][0] = scale;
+            matrix[1][1] = scale;
+            matrix[0][2] = (1-scale)*nw.x;
+            matrix[1][2] = (1-scale)*nw.y;
+            break;
+          case 'NW':
+            var se = ctx.map.project([bbox[2],bbox[1]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2se = (end.x-se.x)*(end.x-se.x)+(end.y-se.y)*(end.y-se.y);//鼠标离左下角的距离
+            var start2se = (start.x-se.x)*(start.x-se.x)+(start.y-se.y)*(start.y-se.y);//起点离左下角的距离
+            var scale = Math.sqrt(end2se/start2se);//缩放倍数
+            matrix[0][0] = scale;
+            matrix[1][1] = scale;
+            matrix[0][2] = (1-scale)*se.x;
+            matrix[1][2] = (1-scale)*se.y;
+            break;
+          case 'SW':
+            var ne = ctx.map.project([bbox[2],bbox[3]]);//bbox左下角点的像素坐标，该点应保持不动
+            var end2ne = (end.x-ne.x)*(end.x-ne.x)+(end.y-ne.y)*(end.y-ne.y);//鼠标离左下角的距离
+            var start2ne = (start.x-ne.x)*(start.x-ne.x)+(start.y-ne.y)*(start.y-ne.y);//起点离左下角的距离
+            var scale = Math.sqrt(end2ne/start2ne);//缩放倍数
+            matrix[0][0] = scale;
+            matrix[1][1] = scale;
+            matrix[0][2] = (1-scale)*ne.x;
+            matrix[1][2] = (1-scale)*ne.y;
+            break;
+          default:
+            break;
+          }
+          transformFeatures(ctx,[transformTarget], matrix);
+        }else{
+          matrix[0][2] = delta.x;
+          matrix[1][2] = delta.y;
+          transformFeatures(ctx,ctx.store.getSelected(), matrix);
+        }
+        //moveFeatures(ctx.store.getSelected(), delta);
 
         dragMoveLocation = e.lngLat;
       });

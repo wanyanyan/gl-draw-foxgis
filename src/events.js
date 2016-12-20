@@ -32,7 +32,7 @@ module.exports = function(ctx) {
       event.originalEvent.stopPropagation();
     }
     else {
-      ctx.ui.queueMapClasses({ mouse: Constants.cursors.DRAG });
+      //ctx.ui.queueMapClasses({ mouse: Constants.cursors.DRAG });
       currentMode.drag(event);
     }
   };

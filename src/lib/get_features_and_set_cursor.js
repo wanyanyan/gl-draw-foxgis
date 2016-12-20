@@ -6,10 +6,15 @@ module.exports = function getFeatureAtAndSetCursors(event, ctx) {
   var classes = { mouse: Constants.cursors.NONE };
 
   if (features[0]) {
-    classes.mouse = (features[0].properties.active === Constants.activeStates.ACTIVE)
-      ? Constants.cursors.MOVE
-      : Constants.cursors.POINTER;
-    classes.feature = features[0].properties.meta;
+    if(features[0].properties.meta !== Constants.meta.CONTROL){
+      classes.mouse = (features[0].properties.active === Constants.activeStates.ACTIVE)
+        ? Constants.cursors.MOVE
+        : Constants.cursors.POINTER;
+      classes.feature = features[0].properties.meta;
+    }else{
+      var location = features[0].properties.location;
+      classes.mouse = Constants.cursors[location];
+    } 
   }
 
   if (ctx.events.currentModeName().indexOf('draw') !== -1) {
