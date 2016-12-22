@@ -65,7 +65,8 @@ module.exports = [
     'type': 'line',
     'filter': ['all',
       ['==', '$type', 'LineString'],
-      ['==', 'active', 'true']
+      ['==', 'active', 'true'],
+      ['==', 'meta', 'feature']
     ],
     'layout': {
       'line-cap': 'round',
@@ -238,6 +239,25 @@ module.exports = [
     'paint': {
       'circle-radius': 3,
       'circle-color': '#fbb03b'
+    },
+    'interactive': true
+  },
+  {
+    'id': 'gl-draw-control-line',
+    'type': 'line',
+    'filter': ['all',
+      ['==', '$type', 'LineString'],
+      ['==', 'meta', 'control'],
+      ['!=', 'mode', 'static']
+    ],
+    'layout': {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    'paint': {
+      'line-color': '#fbb03b',
+      'line-dasharray': [0.2, 2],
+      'line-width': 2
     },
     'interactive': true
   }
