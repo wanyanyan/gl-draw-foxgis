@@ -1,5 +1,6 @@
 function StringSet(items) {
   this._items = {};
+  this._length = items ? items.length : 0;
   if (!items) return;
   for (var i = 0, l = items.length; i < l; i++) {
     if (items[i] === undefined) continue;
@@ -24,7 +25,8 @@ StringSet.prototype.has = function(x) {
 };
 
 StringSet.prototype.values = function() {
-  const orderedKeys = Object.keys(this._items).sort(function(a, b){return this._items[a] - this._items[b];});
+  var _this = this;
+  const orderedKeys = Object.keys(_this._items).sort(function(a, b){return (_this._items[a] - _this._items[b]);});
     return orderedKeys;
 };
 

@@ -6071,6 +6071,7 @@ module.exports = sortFeatures;
 
 function StringSet(items) {
   this._items = {};
+  this._length = items ? items.length : 0;
   if (!items) return;
   for (var i = 0, l = items.length; i < l; i++) {
     if (items[i] === undefined) continue;
@@ -6095,8 +6096,9 @@ StringSet.prototype.has = function (x) {
 };
 
 StringSet.prototype.values = function () {
-  var orderedKeys = Object.keys(this._items).sort(function (a, b) {
-    return this._items[a] - this._items[b];
+  var _this = this;
+  var orderedKeys = Object.keys(_this._items).sort(function (a, b) {
+    return _this._items[a] - _this._items[b];
   });
   return orderedKeys;
 };
@@ -6132,8 +6134,7 @@ module.exports = [{
     'fill-color': '#3bb2d0',
     'fill-outline-color': '#3bb2d0',
     'fill-opacity': 0.1
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-midpoint',
   'type': 'circle',
@@ -6141,8 +6142,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 3,
     'circle-color': '#fbb03b'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-stroke-inactive',
   'type': 'line',
@@ -6154,8 +6154,7 @@ module.exports = [{
   'paint': {
     'line-color': '#3bb2d0',
     'line-width': 2
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-line-inactive',
   'type': 'line',
@@ -6167,8 +6166,7 @@ module.exports = [{
   'paint': {
     'line-color': '#3bb2d0',
     'line-width': 2
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-line-active',
   'type': 'line',
@@ -6181,8 +6179,7 @@ module.exports = [{
     'line-color': '#fbb03b',
     'line-dasharray': [0.2, 2],
     'line-width': 2
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
   'type': 'circle',
@@ -6190,8 +6187,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 5,
     'circle-color': '#fff'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-and-line-vertex-inactive',
   'type': 'circle',
@@ -6199,8 +6195,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 3,
     'circle-color': '#fbb03b'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-point-point-stroke-inactive',
   'type': 'circle',
@@ -6209,8 +6204,7 @@ module.exports = [{
     'circle-radius': 5,
     'circle-opacity': 1,
     'circle-color': '#fff'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-point-inactive',
   'type': 'circle',
@@ -6218,8 +6212,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 3,
     'circle-color': '#3bb2d0'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-point-stroke-active',
   'type': 'circle',
@@ -6227,8 +6220,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 7,
     'circle-color': '#ff0000'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-point-active',
   'type': 'circle',
@@ -6236,8 +6228,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 5,
     'circle-color': '#fbb03b'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-fill-static',
   'type': 'fill',
@@ -6246,8 +6237,7 @@ module.exports = [{
     'fill-color': '#404040',
     'fill-outline-color': '#404040',
     'fill-opacity': 0.1
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-polygon-stroke-static',
   'type': 'line',
@@ -6259,8 +6249,7 @@ module.exports = [{
   'paint': {
     'line-color': '#404040',
     'line-width': 2
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-line-static',
   'type': 'line',
@@ -6272,8 +6261,7 @@ module.exports = [{
   'paint': {
     'line-color': '#404040',
     'line-width': 2
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-point-static',
   'type': 'circle',
@@ -6281,8 +6269,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 5,
     'circle-color': '#404040'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-control-point-stroke',
   'type': 'circle',
@@ -6290,8 +6277,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 5,
     'circle-color': '#fff'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-control-point',
   'type': 'circle',
@@ -6299,8 +6285,7 @@ module.exports = [{
   'paint': {
     'circle-radius': 3,
     'circle-color': '#fbb03b'
-  },
-  'interactive': true
+  }
 }, {
   'id': 'gl-draw-control-line',
   'type': 'line',
@@ -6313,8 +6298,7 @@ module.exports = [{
     'line-color': '#fbb03b',
     'line-dasharray': [0.2, 2],
     'line-width': 2
-  },
-  'interactive': true
+  }
 }];
 
 },{}],57:[function(require,module,exports){
@@ -8651,6 +8635,7 @@ var Store = module.exports = function (ctx) {
   this._featureIds = new StringSet();
   this._controlFeatureIds = new StringSet();
   this._selectedFeatureIds = new StringSet();
+  this._selectedCoordinates = [];
   this._changedFeatureIds = new StringSet();
   this._deletedFeaturesToEmit = [];
   this._emitSelectionChange = false;

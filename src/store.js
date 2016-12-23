@@ -9,6 +9,7 @@ var Store = module.exports = function(ctx) {
   this._featureIds = new StringSet();
   this._controlFeatureIds = new StringSet();
   this._selectedFeatureIds = new StringSet();
+  this._selectedCoordinates = [];
   this._changedFeatureIds = new StringSet();
   this._deletedFeaturesToEmit = [];
   this._emitSelectionChange = false;

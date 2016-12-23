@@ -20,7 +20,7 @@ module.exports = function(ctx,api) {
   api.modes = Constants.modes;
 
   api.getFeatureIdsAt = function(point) {
-    const features = featuresAt({point}, null, ctx);
+    const features = featuresAt({point:point}, null, ctx);
     return features.map(function(feature){return feature.properties.id});
   };
 

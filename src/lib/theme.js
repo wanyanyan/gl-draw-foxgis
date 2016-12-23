@@ -10,8 +10,7 @@ module.exports = [
       'fill-color': '#3bb2d0',
       'fill-outline-color': '#3bb2d0',
       'fill-opacity': 0.1
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-midpoint',
@@ -22,8 +21,7 @@ module.exports = [
     'paint': {
       'circle-radius': 3,
       'circle-color': '#fbb03b'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-stroke-inactive',
@@ -39,8 +37,7 @@ module.exports = [
     'paint': {
       'line-color': '#3bb2d0',
       'line-width': 2
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-line-inactive',
@@ -57,8 +54,7 @@ module.exports = [
     'paint': {
       'line-color': '#3bb2d0',
       'line-width': 2
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-line-active',
@@ -76,8 +72,7 @@ module.exports = [
       'line-color': '#fbb03b',
       'line-dasharray': [0.2, 2],
       'line-width': 2
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-and-line-vertex-stroke-inactive',
@@ -90,8 +85,7 @@ module.exports = [
     'paint': {
       'circle-radius': 5,
       'circle-color': '#fff'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-and-line-vertex-inactive',
@@ -104,8 +98,7 @@ module.exports = [
     'paint': {
       'circle-radius': 3,
       'circle-color': '#fbb03b'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-point-point-stroke-inactive',
@@ -120,8 +113,7 @@ module.exports = [
       'circle-radius': 5,
       'circle-opacity': 1,
       'circle-color': '#fff'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-point-inactive',
@@ -135,8 +127,7 @@ module.exports = [
     'paint': {
       'circle-radius': 3,
       'circle-color': '#3bb2d0'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-point-stroke-active',
@@ -149,8 +140,7 @@ module.exports = [
     'paint': {
       'circle-radius': 7,
       'circle-color': '#ff0000'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-point-active',
@@ -162,8 +152,7 @@ module.exports = [
     'paint': {
       'circle-radius': 5,
       'circle-color': '#fbb03b'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-fill-static',
@@ -173,8 +162,7 @@ module.exports = [
       'fill-color': '#404040',
       'fill-outline-color': '#404040',
       'fill-opacity': 0.1
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-polygon-stroke-static',
@@ -187,8 +175,7 @@ module.exports = [
     'paint': {
       'line-color': '#404040',
       'line-width': 2
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-line-static',
@@ -201,8 +188,7 @@ module.exports = [
     'paint': {
       'line-color': '#404040',
       'line-width': 2
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-point-static',
@@ -211,8 +197,7 @@ module.exports = [
     'paint': {
       'circle-radius': 5,
       'circle-color': '#404040'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-control-point-stroke',
@@ -225,8 +210,7 @@ module.exports = [
     'paint': {
       'circle-radius': 5,
       'circle-color': '#fff'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-control-point',
@@ -239,8 +223,7 @@ module.exports = [
     'paint': {
       'circle-radius': 3,
       'circle-color': '#fbb03b'
-    },
-    'interactive': true
+    }
   },
   {
     'id': 'gl-draw-control-line',
@@ -258,7 +241,6 @@ module.exports = [
       'line-color': '#fbb03b',
       'line-dasharray': [0.2, 2],
       'line-width': 2
-    },
-    'interactive': true
+    }
   }
 ];
