@@ -52,6 +52,11 @@ module.exports = function(ctx) {
       this.on('keyup', CommonSelectors.isEnterKey, function(){
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
       });
+      ctx.events.actionable({
+        combineFeatures: false,
+        uncombineFeatures: false,
+        trash: true
+      });
     },
 
     stop:function(){
@@ -67,8 +72,7 @@ module.exports = function(ctx) {
         ctx.map.fire(Constants.events.CREATE, {
           features: [line.toGeoJSON()]
         });
-      }
-      else {
+      } else {
         ctx.store.delete([line.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, {}, { silent: true });
       }

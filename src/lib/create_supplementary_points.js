@@ -30,7 +30,7 @@ function createSupplementaryPoints(geojson, options, basePath) {
     var firstPointString = '';
     var lastVertex = null;
     line.forEach(function(point, pointIndex){
-      const pointPath = (lineBasePath != undefined) ? String(lineBasePath[pointIndex]) : String(pointIndex);
+      const pointPath = (lineBasePath !== undefined && lineBasePath !== null) ? String(lineBasePath[pointIndex]) : String(pointIndex);
       const vertex = createVertex(featureId, point, pointPath, isSelectedPath(pointPath));
 
       // If we're creating midpoints, check if there was a
@@ -38,7 +38,9 @@ function createSupplementaryPoints(geojson, options, basePath) {
       // between that vertex and this one.
       if (options.midpoints && lastVertex) {
         const midpoint = createMidpoint(featureId, lastVertex, vertex, options.map);
-        if (midpoint) supplementaryPoints.push(midpoint);
+        if (midpoint) {
+          supplementaryPoints.push(midpoint);
+        }
       }
       lastVertex = vertex;
 

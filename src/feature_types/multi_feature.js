@@ -1,20 +1,21 @@
-var Feature = require('./feature');
-var Constants = require('../constants');
+const Feature = require('./feature');
+const Constants = require('../constants');
+const hat = require('hat');
 
-var models = {
+const models = {
   MultiPoint: require('./point'),
   MultiLineString: require('./line_string'),
   MultiPolygon: require('./polygon')
 };
 
-var takeAction = function(features, action, path, lng, lat){
-  var parts = path.split('.');
-  var idx = parseInt(parts[0], 10);
-  var tail = (!parts[1]) ? null : parts.slice(1).join('.');
+const takeAction = function(features, action, path, lng, lat){
+  const parts = path.split('.');
+  const idx = parseInt(parts[0], 10);
+  const tail = (!parts[1]) ? null : parts.slice(1).join('.');
   return features[idx][action](tail, lng, lat);
 };
 
-var MultiFeature = function(ctx, geojson) {
+const MultiFeature = function(ctx, geojson) {
   Feature.call(this, ctx, geojson);
 
   delete this.coordinates;
@@ -61,14 +62,21 @@ MultiFeature.prototype.getCoordinates = function() {
 
 MultiFeature.prototype.updateCoordinate = function(path, lng, lat) {
   takeAction(this.features, 'updateCoordinate', path, lng, lat);
+  this.changed();
 };
 
 MultiFeature.prototype.addCoordinate = function(path, lng, lat) {
   takeAction(this.features, 'addCoordinate', path, lng, lat);
+  this.changed();
 };
 
 MultiFeature.prototype.removeCoordinate = function(path) {
   takeAction(this.features, 'removeCoordinate', path);
+  this.changed();
+};
+
+MultiFeature.prototype.getFeatures = function() {
+  return this.features;
 };
 
 module.exports = MultiFeature;

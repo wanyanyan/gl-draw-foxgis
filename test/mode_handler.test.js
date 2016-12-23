@@ -1,12 +1,12 @@
 import test from 'tape';
 import xtend from 'xtend';
 import spy from 'sinon/lib/sinon/spy'; // avoid babel-register-related error by importing only spy
-import ModeHandler from '../src/lib/mode_handler';
+import modeHandler from '../src/lib/mode_handler';
 import createMockModeHandlerContext from './utils/create_mock_mode_handler_context';
 import createMockMode from './utils/create_mock_mode';
 
 test('returned API', t => {
-  const mh = ModeHandler(createMockMode(), createMockModeHandlerContext());
+  const mh = modeHandler(createMockMode(), createMockModeHandlerContext());
   t.equal(typeof mh.render, 'function', 'exposes render');
   t.equal(typeof mh.stop, 'function', 'exposes stop');
   t.equal(typeof mh.trash, 'function', 'exposes trash');
@@ -18,7 +18,9 @@ test('returned API', t => {
   t.equal(typeof mh.mouseout, 'function', 'exposes mouseout');
   t.equal(typeof mh.keydown, 'function', 'exposes keydown');
   t.equal(typeof mh.keyup, 'function', 'exposes keyup');
-  t.equal(Object.keys(mh).length, 11, 'no unexpected properties');
+  t.equal(typeof mh.combineFeatures, 'function', 'exposes combineFeatures');
+  t.equal(typeof mh.uncombineFeatures, 'function', 'exposes uncombineFeatures');
+  t.equal(Object.keys(mh).length, 13, 'no unexpected properties');
   t.end();
 });
 
@@ -33,7 +35,7 @@ test('ModeHandler calling mode.start with context, and delegation functionality'
   });
   const drawContext = createMockModeHandlerContext();
 
-  const mh = ModeHandler(mode, drawContext);
+  const mh = modeHandler(mode, drawContext);
   t.equal(handleStartSpy.callCount, 1, 'start was called on mode handler creation');
   t.equal(typeof startContext.on, 'function', 'start context has on()');
   t.equal(typeof startContext.render, 'function', 'start context has render()');
@@ -113,7 +115,7 @@ test('ModeHandler calling mode.start with context, and delegation functionality'
 
 test('ModeHandler#stop calling mode.stop', t => {
   const mode = createMockMode();
-  const mh = ModeHandler(mode, createMockModeHandlerContext());
+  const mh = modeHandler(mode, createMockModeHandlerContext());
 
   mh.stop();
   t.equal(mode.stop.callCount, 1, 'mode.stop called');
@@ -124,7 +126,7 @@ test('ModeHandler#stop calling mode.stop', t => {
 test('ModeHandler#stop not calling nonexistent mode.stop', t => {
   const mode = createMockMode();
   delete mode.stop;
-  const mh = ModeHandler(mode, createMockModeHandlerContext());
+  const mh = modeHandler(mode, createMockModeHandlerContext());
 
   t.doesNotThrow(() => {
     mh.stop();
@@ -136,7 +138,7 @@ test('ModeHandler#stop not calling nonexistent mode.stop', t => {
 test('Modehandler#trash', t => {
   const mode = createMockMode();
   const drawContext = createMockModeHandlerContext();
-  const mh = ModeHandler(mode, drawContext);
+  const mh = modeHandler(mode, drawContext);
 
   mh.trash();
   t.equal(mode.trash.callCount, 1, 'mode.trash called');
@@ -149,7 +151,7 @@ test('Modehandler#trash without a mode.trash', t => {
   const mode = createMockMode();
   delete mode.trash;
   const drawContext = createMockModeHandlerContext();
-  const mh = ModeHandler(mode, drawContext);
+  const mh = modeHandler(mode, drawContext);
 
   t.doesNotThrow(() => {
     mh.trash();

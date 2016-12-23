@@ -50,9 +50,12 @@ test('Store constructor and public API', t => {
   t.equal(typeof Store.prototype.isSelected, 'function', 'exposes store.isSelected');
   t.equal(typeof Store.prototype.delete, 'function', 'exposes store.delete');
   t.equal(typeof Store.prototype.setSelected, 'function', 'exposes store.setSelected');
+  t.equal(typeof Store.prototype.setSelectedCoordinates, 'function', 'exposes store.setSelectedCoordinates');
+  t.equal(typeof Store.prototype.getSelectedCoordinates, 'function', 'exposes store.getSelectedCoordinates');
+  t.equal(typeof Store.prototype.clearSelectedCoordinates, 'function', 'exposes store.clearSelectedCoordinates');
   t.equal(typeof Store.prototype.setFeatureProperty, 'function', 'exposes store.setFeatureProperty');
 
-  t.equal(getPublicMemberKeys(Store.prototype).length, 18, 'no untested prototype members');
+  t.equal(getPublicMemberKeys(Store.prototype).length, 21, 'no untested prototype members');
 
   t.end();
 });
@@ -67,13 +70,13 @@ test('Store#setDirty', t => {
 
 test('Store#createRenderBatch', t => {
   const store = createStore();
-  var numRenders = 0;
+  let numRenders = 0;
   store.render = function() {
     numRenders++;
-  }
+  };
   store.render();
   t.equal(numRenders, 1, 'render incrementes number of renders');
-  var renderBatch = store.createRenderBatch();
+  let renderBatch = store.createRenderBatch();
   store.render();
   store.render();
   store.render();
@@ -241,12 +244,13 @@ test('Store#setSelected', t => {
 test('Store#setFeatureProperty', t => {
   const store = createStore();
   const point = createFeature('point');
-  
+
   store.add(point);
-  store.clearChangedIds();  
+  store.clearChangedIds();
   store.setFeatureProperty(point.id, 'size', 200);
   t.deepEqual(store.getChangedIds(), [point.id]);
   t.equal(store.get(point.id).properties.size, 200, 'sets the property on the feature');
 
   t.end();
 });
+

@@ -28,7 +28,7 @@ var map = new mapboxgl.Map({
   zoom: 9
 });
 
-var Draw = mapboxgl.Draw();
+var Draw = new MapboxDraw();
 
 map.addControl(Draw)
 ```

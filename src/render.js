@@ -55,7 +55,17 @@ module.exports = function render() {
 
   if (store._emitSelectionChange) {
     store.ctx.map.fire(Constants.events.SELECTION_CHANGE, {
-      features: store.getSelected().map(function(feature){return feature.toGeoJSON()})
+      features: store.getSelected().map(function(feature){return feature.toGeoJSON()}),
+      points: store.getSelectedCoordinates().map(function(coordinate) {
+        return {
+          type: Constants.geojsonTypes.FEATURE,
+          properties: {},
+          geometry: {
+            type: Constants.geojsonTypes.POINT,
+            coordinates: coordinate.coordinates
+          }
+        };
+      })
     });
     store._emitSelectionChange = false;
   }

@@ -94,28 +94,10 @@ module.exports = function(ctx) {
 
   function addButtons() {
     const controls = ctx.options.controls;
-    if (!controls) return;
+    const controlGroup = document.createElement('div');
+    controlGroup.className = Constants.classes.CONTROL_GROUP+' '+Constants.classes.CONTROL_BASE;
 
-    const ctrlPosClassName = String(Constants.classes.CONTROL_PREFIX)+String(ctx.options.position) || 'top-left';
-    var controlContainer = ctx.container.getElementsByClassName(ctrlPosClassName)[0];
-    if (!controlContainer) {
-      controlContainer = document.createElement('div');
-      controlContainer.className = ctrlPosClassName;
-      ctx.container.appendChild(controlContainer);
-    }
-
-    var controlGroup = controlContainer.getElementsByClassName(Constants.classes.CONTROL_GROUP)[0];
-    if (!controlGroup) {
-      controlGroup = document.createElement('div');
-      controlGroup.className = Constants.classes.CONTROL_GROUP+" "+Constants.classes.CONTROL_BASE;
-
-      const attributionControl = controlContainer.getElementsByClassName(Constants.classes.ATTRIBUTION)[0];
-      if (attributionControl) {
-        controlContainer.insertBefore(controlGroup, attributionControl);
-      } else {
-        controlContainer.appendChild(controlGroup);
-      }
-    }
+    if (!controls) return controlGroup;
 
     if (controls[Constants.types.LINE]) {
       buttonElements[Constants.types.LINE] = createControlButton(Constants.types.LINE, {
@@ -154,6 +136,30 @@ module.exports = function(ctx) {
         }
       });
     }
+
+    if (controls.combine_features) {
+      buttonElements.combine_features = createControlButton('combineFeatures', {
+        container: controlGroup,
+        className: Constants.classes.CONTROL_BUTTON_COMBINE_FEATURES,
+        title: 'Combine',
+        onActivate: function() {
+          ctx.events.combineFeatures();
+        }
+      });
+    }
+
+    if (controls.uncombine_features) {
+      buttonElements.uncombine_features = createControlButton('uncombineFeatures', {
+        container: controlGroup,
+        className: Constants.classes.CONTROL_BUTTON_UNCOMBINE_FEATURES,
+        title: 'Uncombine',
+        onActivate: function() {
+          ctx.events.uncombineFeatures();
+        }
+      });
+    }
+
+    return controlGroup;
   }
 
   function removeButtons() {

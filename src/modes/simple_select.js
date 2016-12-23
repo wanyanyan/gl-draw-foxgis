@@ -8,6 +8,7 @@ const doubleClickZoom = require('../lib/double_click_zoom');
 const moveFeatures = require('../lib/move_features');
 const transformFeatures = require('../lib/transform_features');
 const Constants = require('../constants');
+const MultiFeature = require('../feature_types/multi_feature');
 var geojsonExtent = require('geojson-extent');
 
 module.exports = function(ctx, options) {
@@ -29,6 +30,33 @@ module.exports = function(ctx, options) {
     ctx.map.fire(Constants.events.UPDATE, {
       action: Constants.updateActions.MOVE,
       features: ctx.store.getSelected().map(function(f){return f.toGeoJSON()})
+    });
+  };
+
+  const fireActionable = function() {
+    const selectedFeatures = ctx.store.getSelected();
+
+    const multiFeatures = selectedFeatures.filter(
+      function(feature){return feature instanceof MultiFeature;}
+    );
+
+    let combineFeatures = false;
+
+    if (selectedFeatures.length > 1) {
+      combineFeatures = true;
+      const featureType = selectedFeatures[0].type.replace('Multi', '');
+      selectedFeatures.forEach(function(feature) {
+        if (feature.type.replace('Multi', '') !== featureType) {
+          combineFeatures = false;
+        }
+      });
+    }
+
+    const uncombineFeatures = multiFeatures.length > 0;
+    const trash = selectedFeatures.length > 0;
+
+    ctx.events.actionable({
+      combineFeatures, uncombineFeatures, trash
     });
   };
 
@@ -67,9 +95,12 @@ module.exports = function(ctx, options) {
     start: function() {
       // Select features that should start selected,
       // probably passed in from a `draw_*` mode
-      if (ctx.store) ctx.store.setSelected(initiallySelectedFeatureIds.filter(function(id){
-        return ctx.store.get(id) !== undefined;
-      }));
+      if (ctx.store) {
+        ctx.store.setSelected(initiallySelectedFeatureIds.filter(function(id){
+          return ctx.store.get(id) !== undefined;
+        }));
+        fireActionable();
+      }
 
       // Any mouseup should stop box selecting and dragMoving
       this.on('mouseup', CommonSelectors.true, stopExtendedInteractions);
@@ -379,10 +410,89 @@ module.exports = function(ctx, options) {
       if(geojson.properties.type===Constants.featureTypes.POINT
         ||geojson.properties.type===Constants.featureTypes.LINE){
         createSupplementaryPoints(geojson).forEach(push);
-      }  
+      }
+      fireActionable();  
     },
     trash:function() {
       ctx.store.delete(ctx.store.getSelectedIds());
+      fireActionable();
+    },
+    combineFeatures: function() {
+      const selectedFeatures = ctx.store.getSelected();
+
+      if (selectedFeatures.length === 0 || selectedFeatures.length < 2) return;
+
+      const coordinates = [], featuresCombined = [];
+      const featureType = selectedFeatures[0].type.replace('Multi', '');
+
+      for (let i = 0; i < selectedFeatures.length; i++) {
+        const feature = selectedFeatures[i];
+
+        if (feature.type.replace('Multi', '') !== featureType) {
+          return;
+        }
+        if (feature.type.includes('Multi')) {
+          feature.getCoordinates().forEach(function(subcoords) {
+            coordinates.push(subcoords);
+          });
+        } else {
+          coordinates.push(feature.getCoordinates());
+        }
+
+        featuresCombined.push(feature.toGeoJSON());
+      }
+
+      if (featuresCombined.length > 1) {
+
+        const multiFeature = new MultiFeature(ctx, {
+          type: Constants.geojsonTypes.FEATURE,
+          properties: featuresCombined[0].properties,
+          geometry: {
+            type: `Multi${featureType}`,
+            coordinates: coordinates
+          }
+        });
+
+        ctx.store.add(multiFeature);
+        ctx.store.delete(ctx.store.getSelectedIds(), { silent: true });
+        ctx.store.setSelected([multiFeature.id]);
+
+        ctx.map.fire(Constants.events.COMBINE_FEATURES, {
+          createdFeatures: [multiFeature.toGeoJSON()],
+          deletedFeatures: featuresCombined
+        });
+      }
+      fireActionable();
+    },
+    uncombineFeatures: function() {
+      const selectedFeatures = ctx.store.getSelected();
+      if (selectedFeatures.length === 0) return;
+
+      const createdFeatures = [];
+      const featuresUncombined = [];
+
+      for (let i = 0; i < selectedFeatures.length; i++) {
+        const feature = selectedFeatures[i];
+
+        if (feature instanceof MultiFeature) {
+          feature.getFeatures().forEach(function(subFeature) {
+            ctx.store.add(subFeature);
+            subFeature.properties = feature.properties;
+            createdFeatures.push(subFeature.toGeoJSON());
+            ctx.store.select([subFeature.id]);
+          });
+          ctx.store.delete(feature.id, { silent: true });
+          featuresUncombined.push(feature.toGeoJSON());
+        }
+      }
+
+      if (createdFeatures.length > 1) {
+        ctx.map.fire(Constants.events.UNCOMBINE_FEATURES, {
+          createdFeatures: createdFeatures,
+          deletedFeatures: featuresUncombined
+        });
+      }
+      fireActionable();
     }
   };
 };

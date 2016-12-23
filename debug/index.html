@@ -76,29 +76,35 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imdlb3dheSIsImlhdCI6MTQ4MjIwNjQwMywiZXhwIjoxNDgyODExMjAzfQ.8Ve_DID9NKXy489h1t4VXHD-SVge52PXkwSGsv3jFJ0'
   });
 
-  map.addControl(new mapboxgl.Navigation({
-    position: 'top-left'
-  }));
+  map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
-  var Draw = window.Draw = mapboxgl.Draw({ position: 'bottom-right',boxSelect:false });
-  map.addControl(Draw);
+  var Draw = window.Draw = new MapboxDraw();
+  var drawIsActive = true;
+  map.addControl(Draw, 'bottom-right');
 
   map.on('load', function() {
 
     // toggle
     var addButton = document.getElementById('addBtn');
     var removeButton = document.getElementById('removeBtn');
+    var flipStyleButton = document.getElementById('flipStyleBtn');
+    var currentStyle = 'geoway_admin';
     addButton.onclick = function() {
-      if (Draw) return;
-      Draw = mapboxgl.Draw();
-      map.addControl(Draw);
+      if (drawIsActive) return;
+      drawIsActive = true;
+      map.addControl(Draw, 'bottom-right');
     }
     removeButton.onclick = function() {
-      if (!Draw) return;
-      Draw.remove();
-      Draw = null;
+      if (!drawIsActive) return;
+      drawIsActive = false;
+      map.removeControl(Draw);
     }
 
+    flipStyleButton.onclick = function() {
+      var style = currentStyle === 'geoway_admin' ? 'dark-v9' : 'streets-v9';
+      map.setStyle('mapbox://styles/mapbox/' + style);
+      currentStyle = style;
+    }
     var startPoint = document.getElementById('start-point');
     var startLine = document.getElementById('start-line');
     var startPolygon = document.getElementById('start-polygon');

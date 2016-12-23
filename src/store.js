@@ -203,6 +203,7 @@ Store.prototype.deselect = function(featureIds, options) {
       _this._emitSelectionChange = true;
     }
   });
+  refreshSelectedCoordinates.call(this, options);
   return this;
 };
 
@@ -245,6 +246,28 @@ Store.prototype.setSelected = function(featureIds, options) {
 };
 
 /**
+ * Sets the store's coordinates selection, clearing any prior values.
+ * @param {Array<Array<string>>} coordinates
+ * @return {Store} this
+ */
+Store.prototype.setSelectedCoordinates = function(coordinates) {
+  this._selectedCoordinates = coordinates;
+  this._emitSelectionChange = true;
+  return this;
+};
+
+/**
+ * Clears the current coordinates selection.
+ * @param {Object} [options]
+ * @return {Store} this
+ */
+Store.prototype.clearSelectedCoordinates = function() {
+  this._selectedCoordinates = [];
+  this._emitSelectionChange = true;
+  return this;
+};
+ 
+/**
  * Returns the ids of features in the current selection.
  * @return {Array<string>} Selected feature ids.
  */
@@ -264,6 +287,14 @@ Store.prototype.getSelected = function() {
 };
 
 /**
+ * Returns selected coordinates in the currently selected feature.
+ * @return {Array<Object>} Selected coordinates.
+ */
+Store.prototype.getSelectedCoordinates = function() {
+  return this._selectedCoordinates;
+};
+
+/**
  * Indicates whether a feature is selected.
  * @param {string} featureId
  * @return {boolean} `true` if the feature is selected, `false` if not.
@@ -276,10 +307,18 @@ Store.prototype.isSelected = function(featureId) {
  * wanyanyan 2016/11/09 设置属性
  * Sets a property on the given feature
  * @param {string} featureId
- * @param {string} property name.
+ * @param {string} property property.
  * @param {string} property value
  */
- Store.prototype.setFeatureProperty = function(featureId,name,value){
-  this.get(featureId).setProperty(name,value);
+ Store.prototype.setFeatureProperty = function(featureId, property ,value){
+  this.get(featureId).setProperty(property, value);
   this.featureChanged(featureId);
  };
+
+ function refreshSelectedCoordinates(options) {
+  const newSelectedCoordinates = this._selectedCoordinates.filter(function(point){return this._selectedFeatureIds.has(point.feature_id)});
+  if (this._selectedCoordinates.length !== newSelectedCoordinates.length && !options.silent) {
+    this._emitSelectionChange = true;
+  }
+  this._selectedCoordinates = newSelectedCoordinates;
+}

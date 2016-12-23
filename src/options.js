@@ -3,7 +3,6 @@ const Constants = require('./constants');
 
 const defaultOptions = {
   defaultMode: Constants.modes.SIMPLE_SELECT,
-  position: 'top-left',
   keybindings: true,
   clickBuffer: 2,
   boxSelect: true,
@@ -16,14 +15,18 @@ const showControls = {
   point: true,
   line_string: true,
   polygon: true,
-  trash: true
+  trash: true,
+  combine_features: true,
+  uncombine_features: true
 };
 
 const hideControls = {
   point: false,
   line_string: false,
   polygon: false,
-  trash: false
+  trash: false,
+  combine_features: false,
+  uncombine_features: false
 };
 
 function addSources(styles, sourceBucket) {
@@ -31,9 +34,7 @@ function addSources(styles, sourceBucket) {
     if (style.source) return style;
     return xtend(style, {
       id: style.id+"."+sourceBucket,
-      source: (sourceBucket === 'hot')
-        ? Constants.sources.HOT
-        : Constants.sources.COLD
+      source: (sourceBucket === 'hot') ? Constants.sources.HOT : Constants.sources.COLD
     });
   });
 }

@@ -3,7 +3,7 @@
 使用方法
 
 ```js
-var Draw = mapboxgl.Draw({ options });
+var Draw = new MapboxDraw({ options });
 map.addControl(Draw);
 ```
 
@@ -21,12 +21,11 @@ map.on('load', function() {
 
 选项 | 类型 | 功能
 --- | --- | ---
-drawing | boolean | 是否允许绘制和删除要素 - 默认: `true`
 keybindings | boolean | 为绘图绑定快捷键 - 默认: `true`
 boxSelect | boolean | If true, shift + click to features. If false, click + select zooms to area - default: `true`
 clickBuffer | number | 鼠标点击时选取要素的缓冲区 - 默认: `2`
 displayControlsDefault | boolean | 设置控制选项的默认值 - default `true`
-controls | Object | 自定义控制按钮. 从 `displayControlsDefault` 中获得默认值. 可选的值有: point, line, polygon, trash.
+controls | Object | 自定义控制按钮. 从 `displayControlsDefault` 中获得默认值. 可选的值有: point, line_string, polygon, trash,combine_features,uncombine_features.
 styles | Array | 样式对象的数组. 默认情况Draw会提供一个默认的样式，如果要覆盖默认样式，可参考[Styling Draw](#styling-draw).
 
 ## 模式
@@ -117,6 +116,8 @@ In this mode, features can have their active state changed by the user. To contr
 
 `mapboxgl.Draw()` 返回一个 `Draw` 实例，该实例具有以下API方法:
 
+---
+
 ###`.add(Object: GeoJSON) -> [String]`
 
 将一个geojson要素添加到地图上
@@ -145,6 +146,8 @@ console.log(featureId)
 //=> unique-id
 ```
 
+---
+
 ###`.get(String: featureId) -> Object`
 
 输入id，返回对应的geojson要素
@@ -157,6 +160,8 @@ console.log(Draw.get(id));
 //=> { type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] } }
 ```
 
+---
+
 ### `.getFeatureIdsAt(Object: point) -> [featureId, featuresId]`
 
 给定一个具有x、y属性的点，返回该点范围内所有绘制的要素id。x和y的值为像素坐标，不是经纬度。
@@ -166,9 +171,26 @@ var featureIds = Draw.getFeatureIdsAt(20, 20);
 console.log(featureIds)
 //=> ['top-feature-at-20-20', 'another-feature-at-20-20']
 ```
+
+---
+
 ### `.getSelectedIds() -> [featureId, featuresId]`
 
 返回所有处于选中状态的要素id，如果没有要素被选中，则返回空数组。
+
+---
+
+### `.getSelected() -> Object`
+
+返回一个要素集(FeatureCollection)，包含所有选中的要素，如果没有要素被选中，将返回一个空要素集。
+
+---
+
+###`.getSelectedPoints() -> [Object: GeoJSON]`
+
+以Geojson要素的形式返回当前选中状态下的所有要素节点。
+
+---
 
 ###`.getAll() -> Object`
 
@@ -211,6 +233,8 @@ console.log(Draw.getAll());
 //  ]
 //}
 ```
+
+---
 
 ###`.delete(String | Array<String> : id) -> Draw`
 
@@ -273,9 +297,41 @@ var ids = Draw.set({type: 'FeatureCollection', features: [{
 
 ---
 
+### `.combineFeatures() -> Draw`
+
+This invokes the current modes combineFeatures action. For the `simple_select` mode this function will combine all selected features into a multifeature, so long as they are all of the same geometry type. For example:
+
+- LineString, LineString => MultiLineString
+- MultiLineString, LineString => MultiLineString
+- MultiLineString, MultiLineString => MultiLineString
+
+Calling this function on different geometry types will not cause any changes. For example:
+
+- Point, LineString => no action taken
+- MultiLineString, MultiPoint => no action taken
+
+When called in the `direct_select` and drawing modes no action is taken. The current modes are also not exited.
+
+---
+
+### `.uncombineFeatures() -> Draw`
+
+This invokes the current modes uncombineFeatures action. For the `simple_select` mode this takes the currently selected features, and for each multi-feature selected, it will split it into its component feature parts. For example:
+  
+- MultiLineString (of two parts) => LineString, LineString 
+- MultiLineString (of three parts) => LineString, LineString, LineString
+- MultiLineString (of two parts), Point => LineString, LineString, Point
+- LineString => LineString
+
+When called in the `direct_select` and drawing modes no action is taken. The current modes are also not exited.
+
+---
+
 ### `.getMode() -> Draw`
 
 返回当前的模式
+
+---
 
 ### `.changeMode(String: mode, ?Object: options) -> Draw`
 
@@ -296,6 +352,12 @@ var ids = Draw.set({type: 'FeatureCollection', features: [{
   featureId: string
 }
 ```
+
+---
+
+### `.setFeatureProperty(String: featureId, String: property, Any: value) -> Draw`
+
+Sets the value of a property on the indicated feature. This is good if you are using Draw as your primary data store in your application.
 
 ## Events
 
@@ -337,6 +399,38 @@ The event data is an object with the following shape:
 }
 ```
 
+### `draw.combine`
+
+Fired when features are combined. The following will trigger this event:
+
+- Click the Combine button when more than one features are selected in `simple_select` mode.
+- Invoke `Draw.combineFeatures()` when you have more than one features selected in `simple_select` mode.
+
+The event data is an object with the following shape:
+
+```js
+{
+  deletedFeatures: Array<Object>, // Array of GeoJSON objects representing the features that were deleted
+  createdFeatures: Array<Object> // Array of GeoJSON objects representing the multifeature that has been created
+}
+```
+
+### `draw.uncombine`
+
+Fired when features are uncombined. The following will trigger this event:
+
+- Click the Uncombine button when one or more multifeatures are selected in `simple_select` mode. Non multifeatures may also be selected.
+- Invoke `Draw.uncombineFeatures()` when you have one or more multifeatures selected in `simple_select` mode. Non multifeatures may also be selected.
+
+The event data is an object with the following shape:
+
+```js
+{
+  deletedFeatures: Array<Object>, // Array of GeoJSON objects representing the multifeatures that were deleted
+  createdFeatures: Array<Object> // Array of GeoJSON objects representing the single features that have been created
+}
+```
+
 ### `draw.update`
 
 Fired when one or more features are updated. The following will trigger this event, which can be subcategorized by `action`:
@@ -365,12 +459,16 @@ The event data is an object with the following shape:
 Fired when the selection is changed (one or more features are selected or deselected). The following will trigger this event:
 
 - Click on a feature to select it.
-- Create a box-selection that includes at least one feature.
 - When a feature is already selected, shift-click on another feature to add it to the selection.
+-Click on a vertex to select it.
+- When a vertex is already selected, shift-click on another vertex to add it to the selection.
+- Create a box-selection that includes at least one feature.
 - Click outside the selected feature(s) to deselect.
+- Click away from the selected vertex(s) to deselect.
 - Finish drawing a feature (features are selected just after they are created).
 - When a feature is already selected, invoke `Draw.changeMode()` such that the feature becomes deselected.
 - Use `Draw.changeMode('simple_select', { featureIds: [..] })` to switch to `simple_select` mode and immediately select the specified features.
+- Use `Draw.delete`, `Draw.deleteAll` or `Draw.trash` to delete feature(s).
 
 The event data is an object with the following shape:
 
@@ -407,6 +505,21 @@ The event data is an object with the following shape:
 ### `draw.render`
 
 Fired just after Draw calls `setData()` on `mapbox-gl-js`. This does not imply that the set data call has updated the map, just that the map is being updated.
+
+
+### `draw.actionable`
+
+Fired as the state of Draw changes to enable and disable different actions. Following this event will enable you know if `Draw.trash()`, `Draw.combineFeatures()` and `Draw.uncombineFeatures()` will have an effect.
+
+```js
+{
+  actions: {
+    trash: true
+    combineFeatures: false,
+    uncombineFeatures: false
+  }
+}
+```
 
 ## Styling Draw
 

@@ -1,9 +1,9 @@
-var ModeHandler = require('./lib/mode_handler');
-var getFeaturesAndSetCursor = require('./lib/get_features_and_set_cursor');
-var isClick = require('./lib/is_click');
-var Constants = require('./constants');
+const setupModeHandler = require('./lib/mode_handler');
+const getFeaturesAndSetCursor = require('./lib/get_features_and_set_cursor');
+const isClick = require('./lib/is_click');
+const Constants = require('./constants');
 
-var modes = {};
+const modes = {};
 modes[Constants.modes.SIMPLE_SELECT] = require('./modes/simple_select');
 modes[Constants.modes.DIRECT_SELECT] = require('./modes/direct_select');
 modes[Constants.modes.DRAW_POINT] = require('./modes/draw_point');
@@ -20,9 +20,9 @@ modes[Constants.modes.STATIC] = require('./modes/static');
 module.exports = function(ctx) {
 
   var mouseDownInfo = {};
-  var events = {};
+  const events = {};
   var currentModeName = Constants.modes.SIMPLE_SELECT;
-  var currentMode = ModeHandler(modes.simple_select(ctx), ctx);
+  var currentMode = setupModeHandler(modes.simple_select(ctx), ctx);
 
   events.drag = function(event) {
     if (isClick(mouseDownInfo, {
@@ -38,10 +38,11 @@ module.exports = function(ctx) {
   };
 
   events.mousemove = function(event) {
-    if (event.originalEvent.which === 1) {
+    const button = event.originalEvent.buttons !== undefined ? event.originalEvent.buttons : event.originalEvent.which;
+    if (button === 1) {
       return events.drag(event);
     }
-    var target = getFeaturesAndSetCursor(event, ctx);
+    const target = getFeaturesAndSetCursor(event, ctx);
     event.featureTarget = target;
     currentMode.mousemove(event);
   };
@@ -57,7 +58,7 @@ module.exports = function(ctx) {
   };
 
   events.mouseup = function(event) {
-    var target = getFeaturesAndSetCursor(event, ctx);
+    const target = getFeaturesAndSetCursor(event, ctx);
     event.featureTarget = target;
 
     if (isClick(mouseDownInfo, {
@@ -65,8 +66,7 @@ module.exports = function(ctx) {
       time: new Date().getTime()
     })) {
       currentMode.click(event);
-    }
-    else {
+    } else {
       currentMode.mouseup(event);
     }
   };
@@ -77,23 +77,19 @@ module.exports = function(ctx) {
 
   // 8 - Backspace
   // 46 - Delete
-  var isKeyModeValid = function(code){return !(code === 8 || code === 46 || (code >= 48 && code <= 57))};
+  const isKeyModeValid = function(code){return !(code === 8 || code === 46 || (code >= 48 && code <= 57))};
 
   events.keydown = function(event) {
     if ((event.keyCode === 8 || event.keyCode === 46) && ctx.options.controls.trash) {
       event.preventDefault();
       currentMode.trash();
-    }
-    else if (isKeyModeValid(event.keyCode)) {
+    } else if (isKeyModeValid(event.keyCode)) {
       currentMode.keydown(event);
-    }
-    else if (event.keyCode === 49 && ctx.options.controls.point) {
+    } else if (event.keyCode === 49 && ctx.options.controls.point) {
       changeMode(Constants.modes.DRAW_POINT);
-    }
-    else if (event.keyCode === 50 && ctx.options.controls.line_string) {
+    } else if (event.keyCode === 50 && ctx.options.controls.line_string) {
       changeMode(Constants.modes.DRAW_LINE_STRING);
-    }
-    else if (event.keyCode === 51 && ctx.options.controls.polygon) {
+    } else if (event.keyCode === 51 && ctx.options.controls.polygon) {
       changeMode(Constants.modes.DRAW_POLYGON);
     }
   };
@@ -108,17 +104,29 @@ module.exports = function(ctx) {
     ctx.store.changeZoom();
   };
 
+  events.data = function(event) {
+    if (event.dataType === 'style') {
+      const { setup, map, options, store } = ctx;
+      const hasLayers = !!options.styles.find(function(style){return map.getLayer(style.id)});
+      if (!hasLayers) {
+        setup.addLayers();
+        store.setDirty();
+        store.render();
+      }
+    }
+  };
+
   function changeMode(modename, nextModeOptions, eventOptions) {
     if(eventOptions===undefined){eventOptions={};}
     currentMode.stop();
 
-    var modebuilder = modes[modename];
+    const modebuilder = modes[modename];
     if (modebuilder === undefined) {
       throw new Error(modename+" is not valid");
     }
     currentModeName = modename;
-    var mode = modebuilder(ctx, nextModeOptions);
-    currentMode = ModeHandler(mode, ctx);
+    const mode = modebuilder(ctx, nextModeOptions);
+    currentMode = setupModeHandler(mode, ctx);
 
     if (!eventOptions.silent) {
       ctx.map.fire(Constants.events.MODE_CHANGE, { mode: modename});
@@ -128,8 +136,25 @@ module.exports = function(ctx) {
     ctx.store.render();
   }
 
-  var api = {
+  const actionState = {
+    trash: false,
+    combineFeatures: false,
+    uncombineFeatures: false
+  };
+
+  function actionable(actions) {
+    var changed = false;
+    Object.keys(actions).forEach(function(action) {
+      if (actionState[action] === undefined) throw new Error('Invalid action type');
+      if (actionState[action] !== actions[action]) changed = true;
+      actionState[action] = actions[action];
+    });
+    if (changed) ctx.map.fire(Constants.events.ACTIONABLE, { actions: actionState });
+  }
+
+  const api = {
     changeMode:changeMode,
+    actionable:actionable,
     currentModeName: function() {
       return currentModeName;
     },
@@ -143,9 +168,9 @@ module.exports = function(ctx) {
     },
     addEventListeners: function() {
       ctx.map.on('mousemove', events.mousemove);
-
       ctx.map.on('mousedown', events.mousedown);
       ctx.map.on('mouseup', events.mouseup);
+      ctx.map.on('data', events.data);
 
       ctx.container.addEventListener('mouseout', events.mouseout);
 
@@ -156,9 +181,9 @@ module.exports = function(ctx) {
     },
     removeEventListeners: function() {
       ctx.map.off('mousemove', events.mousemove);
-
       ctx.map.off('mousedown', events.mousedown);
       ctx.map.off('mouseup', events.mouseup);
+      ctx.map.off('data', events.data);
 
       ctx.container.removeEventListener('mouseout', events.mouseout);
 
@@ -169,6 +194,12 @@ module.exports = function(ctx) {
     },
     trash: function(options) {
       currentMode.trash(options);
+    },
+    combineFeatures: function() {
+      currentMode.combineFeatures();
+    },
+    uncombineFeatures: function() {
+      currentMode.uncombineFeatures();
     },
     getMode: function() {
       return currentModeName;

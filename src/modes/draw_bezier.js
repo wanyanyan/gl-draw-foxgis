@@ -84,6 +84,11 @@ module.exports = function(ctx) {
       this.on('keyup', CommonSelectors.isEnterKey, function(){
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
       });
+      ctx.events.actionable({
+        combineFeatures: false,
+        uncombineFeatures: false,
+        trash: true
+      });
     },
 
     stop:function(){

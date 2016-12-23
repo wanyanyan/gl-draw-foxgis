@@ -1,6 +1,7 @@
-var sortFeatures = require('./sort_features');
-var mapEventToBoundingBox = require('./map_event_to_bounding_box');
-var Constants = require('../constants');
+const sortFeatures = require('./sort_features');
+const mapEventToBoundingBox = require('./map_event_to_bounding_box');
+const Constants = require('../constants');
+const StringSet = require('./string_set');
 
 var META_TYPES = [
   Constants.meta.FEATURE,
@@ -13,9 +14,7 @@ var META_TYPES = [
 module.exports = function(event, bbox, ctx) {
   if (ctx.map === null) return [];
 
-  var box = (event)
-    ? mapEventToBoundingBox(event, ctx.options.clickBuffer)
-    : bbox;
+  const box = (event) ? mapEventToBoundingBox(event, ctx.options.clickBuffer) : bbox;
 
   var queryParams = {};
   if (ctx.options.styles) queryParams.layers = ctx.options.styles.map(function(s){return s.id});
@@ -24,6 +23,15 @@ module.exports = function(event, bbox, ctx) {
     .filter(function(feature) {
       return META_TYPES.indexOf(feature.properties.meta) !== -1;
     });
+
+  const featureIds = new StringSet();
+  const uniqueFeatures = [];
+  features.forEach(function(feature) {
+    const featureId = feature.properties.id;
+    if (featureIds.has(featureId)) return;
+    featureIds.add(featureId);
+    uniqueFeatures.push(feature);
+  });
 
   return sortFeatures(features);
 };
