@@ -106,7 +106,10 @@ module.exports = function(ctx) {
 
   events.data = function(event) {
     if (event.dataType === 'style') {
-      const { setup, map, options, store } = ctx;
+      const setup = ctx.setup;
+      const map = ctx.map;
+      const options = ctx.options;
+      const store = ctx.store;
       const hasLayers = !!options.styles.find(function(style){return map.getLayer(style.id)});
       if (!hasLayers) {
         setup.addLayers();

@@ -40,7 +40,7 @@ module.exports = function(ctx, options) {
       function(feature){return feature instanceof MultiFeature;}
     );
 
-    let combineFeatures = false;
+    var combineFeatures = false;
 
     if (selectedFeatures.length > 1) {
       combineFeatures = true;
@@ -56,7 +56,7 @@ module.exports = function(ctx, options) {
     const trash = selectedFeatures.length > 0;
 
     ctx.events.actionable({
-      combineFeatures, uncombineFeatures, trash
+      combineFeatures:combineFeatures, uncombineFeatures:uncombineFeatures, trash:trash
     });
   };
 
@@ -425,7 +425,7 @@ module.exports = function(ctx, options) {
       const coordinates = [], featuresCombined = [];
       const featureType = selectedFeatures[0].type.replace('Multi', '');
 
-      for (let i = 0; i < selectedFeatures.length; i++) {
+      for (var i = 0; i < selectedFeatures.length; i++) {
         const feature = selectedFeatures[i];
 
         if (feature.type.replace('Multi', '') !== featureType) {
@@ -448,7 +448,7 @@ module.exports = function(ctx, options) {
           type: Constants.geojsonTypes.FEATURE,
           properties: featuresCombined[0].properties,
           geometry: {
-            type: `Multi${featureType}`,
+            type: 'Multi'+featureType,
             coordinates: coordinates
           }
         });
@@ -471,7 +471,7 @@ module.exports = function(ctx, options) {
       const createdFeatures = [];
       const featuresUncombined = [];
 
-      for (let i = 0; i < selectedFeatures.length; i++) {
+      for (var i = 0; i < selectedFeatures.length; i++) {
         const feature = selectedFeatures[i];
 
         if (feature instanceof MultiFeature) {

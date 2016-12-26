@@ -82,7 +82,7 @@ module.exports = function(ctx, opts) {
 
   function pathsToCoordinates(featureId, paths) {
     return paths.map(function(coord_path){
-      return { feature_id: featureId, coord_path, coordinates: feature.getCoordinate(coord_path) 
+      return { feature_id: featureId, coord_path: coord_path, coordinates: feature.getCoordinate(coord_path) 
       }; 
     });
   }
@@ -111,7 +111,7 @@ module.exports = function(ctx, opts) {
     });
 
     var constrainedDelta = constrainFeatureMovement(selectedCoordPoints, delta);
-    for (let i = 0; i < selectedCoords.length; i++) {
+    for (var i = 0; i < selectedCoords.length; i++) {
       const coord = selectedCoords[i];
       feature.updateCoordinate(selectedCoordPaths[i],
       coord[0] + constrainedDelta.lng,
@@ -168,7 +168,7 @@ module.exports = function(ctx, opts) {
       this.on('click', isInactiveFeature, function() {
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
-      this.on('click', CommonSelectors.isActiveFeature, () => {
+      this.on('click', CommonSelectors.isActiveFeature, function() {
         selectedCoordPaths = [];
         ctx.store.clearSelectedCoordinates();
         feature.changed();
