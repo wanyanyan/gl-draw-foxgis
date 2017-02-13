@@ -64,9 +64,6 @@
     "unassertify": "^2.0.3",
     "cross-env": "^1.0.6"
   },
-  "peerDependencies": {
-    "mapbox-gl": "^0.27.0 || ^0.28.0"
-  },
   "dependencies": {
     "bezier": "^0.1.0",
     "geojson-area": "^0.2.1",
