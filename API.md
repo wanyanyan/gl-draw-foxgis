@@ -543,9 +543,9 @@ mode |  simple_select, direct_select, draw_point, draw_line_string, draw_polygon
 
 Draw还提供一些其他的属性，但是不建议用来进行设置样式。更多详情可查看 `通过map.queryRenderFeatures使用Draw`.
 
-### Example Custom Styles
+### 自定义样式示例
 
-See [EXAMPLES.md](https://github.com/wanyanyan/gl-draw-foxgis/blob/master/EXAMPLES.md) for examples of custom styles.reference.
+查看[EXAMPLES.md](https://github.com/wanyanyan/gl-draw-foxgis/blob/master/EXAMPLES.md) 来获得自定义样式参考的示例。
 
 ## 通过 `map.queryRenderFeatures`使用Draw
 
