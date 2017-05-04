@@ -69,13 +69,6 @@ module.exports = function(ctx) {
           points_x[1] = p.x;
           points_y[1] = p.y;
         }
-        /*points_x[currentVertexPosition] = p.x;
-        points_y[currentVertexPosition] = p.y;
-        points_x.pop();points_y.pop();
-        points_x.push(p.x);
-        points_y.push(p.y);
-        points_x.push(0);
-        points_y.push(0);*/
         currentVertexPosition++;
       });
       this.on('click', CommonSelectors.isVertex, function(){

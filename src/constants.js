@@ -59,6 +59,7 @@ module.exports = {
     DRAW_ARROW: 'draw_arrow',
     DRAW_ARC: 'draw_arc',
     DRAW_BEZIER: 'draw_bezier',
+    DRAW_BEZIER_ARROW: 'draw_bezier_arrow',
     SIMPLE_SELECT: 'simple_select',
     DIRECT_SELECT: 'direct_select',
     STATIC: 'static'
@@ -93,7 +94,8 @@ module.exports = {
     BEZIER:'bezier',
     CIRCLE:'circle',
     RECTANGLE:'rectangle',
-    TRIANGLE:'triangle'
+    TRIANGLE:'triangle',
+    BEZIER_ARROW:'bezier_arrow'
   },
   activeStates: {
     ACTIVE: 'true',

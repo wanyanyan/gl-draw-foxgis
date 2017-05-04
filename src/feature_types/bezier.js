@@ -3,7 +3,9 @@ var LineString = require('./line_string');
 var BezierJs = require('bezier');
 
 var Bezier = function(ctx, geojson) {
-  Feature.call(this, ctx, geojson);
+	if(ctx && geojson) {
+		Feature.call(this, ctx, geojson);
+	}  
 };
 
 Bezier.prototype = new LineString();

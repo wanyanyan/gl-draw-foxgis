@@ -10,10 +10,10 @@
     body { margin:0; padding:0; }
     html, body, #map { height: 100%; }
     .start-draw {
-      width: 500px;
+      width: 100%;
       position: absolute;
-      left :10px;
-      bottom: 10px;
+      /* margin: 10px; */
+      bottom: 0;
       background: #efefef;
     }
     .start-draw div {
@@ -43,6 +43,7 @@
   <div id='start-arrow'>箭头</div>
   <div id='start-arc'>圆弧</div>
   <div id='start-bezier'>曲线</div>
+  <div id='start-bezier_arrow'>曲线箭头</div>
 </div>
 <div class='toggle'>
   <button id='addBtn'>add draw</button>
@@ -115,6 +116,7 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startArrow = document.getElementById('start-arrow');
     var startArc = document.getElementById('start-arc');
     var startBezier = document.getElementById('start-bezier');
+    var startBezierArrow = document.getElementById('start-bezier_arrow');
 
 
     startPoint.onclick = function() {
@@ -151,6 +153,10 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
     startBezier.onclick = function() {
       Draw.changeMode('draw_bezier');
+    };
+
+    startBezierArrow.onclick = function() {
+      Draw.changeMode('draw_bezier_arrow');
     };
 
   });
