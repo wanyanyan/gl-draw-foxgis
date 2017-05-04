@@ -38,9 +38,7 @@ styles | Array | 样式对象的数组. 默认情况Draw会提供一个默认的
 
 允许选择、删除和移动要素。
 
-In this mode, features can have their active state changed by the user. To control what is active, react to changes as described in the events section below.
-
-每次单个要素绘制完成以后会自动进入 `simple_select` 模式.
+该模式下，要素处于活动的状态，用户可以控制处于活动状态的要素。每次单个要素绘制完成以后会自动进入 `simple_select` 模式。
 
 ### `direct_select`
 
@@ -118,7 +116,7 @@ In this mode, features can have their active state changed by the user. To contr
 
 ---
 
-###`.add(Object: GeoJSON) -> [String]`
+### `.add(Object: GeoJSON) -> [String]`
 
 将一个geojson要素添加到地图上
 输入参数：geojson类型的要素(feature)或要素集(featurecollection)
@@ -148,7 +146,7 @@ console.log(featureId)
 
 ---
 
-###`.get(String: featureId) -> Object`
+### `.get(String: featureId) -> Object`
 
 输入id，返回对应的geojson要素
 
@@ -186,13 +184,13 @@ console.log(featureIds)
 
 ---
 
-###`.getSelectedPoints() -> [Object: GeoJSON]`
+### `.getSelectedPoints() -> [Object: GeoJSON]`
 
 以Geojson要素的形式返回当前选中状态下的所有要素节点。
 
 ---
 
-###`.getAll() -> Object`
+### `.getAll() -> Object`
 
 以geojson要素集的形式返回所有绘制的要素。
 
@@ -236,7 +234,7 @@ console.log(Draw.getAll());
 
 ---
 
-###`.delete(String | Array<String> : id) -> Draw`
+### `.delete(String | Array<String> : id) -> Draw`
 
 给定一个id或者一个包含多个id的数组，删除对应id的要素。
 
@@ -255,7 +253,7 @@ Draw
 
 ---
 
-###`.deleteAll() -> Draw`
+### `.deleteAll() -> Draw`
 
 删除绘制的所有要素
 
@@ -299,31 +297,31 @@ var ids = Draw.set({type: 'FeatureCollection', features: [{
 
 ### `.combineFeatures() -> Draw`
 
-This invokes the current modes combineFeatures action. For the `simple_select` mode this function will combine all selected features into a multifeature, so long as they are all of the same geometry type. For example:
+在当前模式下执行聚合要素的操作。在 `simple_select` 模式，如果所有选中的要素是同一种几何类型，那么这些要素将会合并成一个多要素集合。例如：
 
 - LineString, LineString => MultiLineString
 - MultiLineString, LineString => MultiLineString
 - MultiLineString, MultiLineString => MultiLineString
 
-Calling this function on different geometry types will not cause any changes. For example:
+如果选中要素的乐和类型不同，则不会执行任何操作。例如：
 
-- Point, LineString => no action taken
-- MultiLineString, MultiPoint => no action taken
+- Point, LineString => 不执行
+- MultiLineString, MultiPoint => 不执行
 
-When called in the `direct_select` and drawing modes no action is taken. The current modes are also not exited.
+如果在 `direct_select` 模式或者绘图模式，同样不会执行任何操作，当前模式也不会退出。
 
 ---
 
 ### `.uncombineFeatures() -> Draw`
 
-This invokes the current modes uncombineFeatures action. For the `simple_select` mode this takes the currently selected features, and for each multi-feature selected, it will split it into its component feature parts. For example:
+在当前模式下执行分离要素的操作。如果在 `simple_select` 模式下，会将选中的多要素集合分离成各自单独的要素。例如：
   
-- MultiLineString (of two parts) => LineString, LineString 
-- MultiLineString (of three parts) => LineString, LineString, LineString
-- MultiLineString (of two parts), Point => LineString, LineString, Point
+- MultiLineString (包含两部分) => LineString, LineString 
+- MultiLineString (包含三部分) => LineString, LineString, LineString
+- MultiLineString (包含两部分), Point => LineString, LineString, Point
 - LineString => LineString
 
-When called in the `direct_select` and drawing modes no action is taken. The current modes are also not exited.
+如果在 `direct_select` 模式或者绘图模式，同样不会执行任何操作，当前模式也不会退出。
 
 ---
 
@@ -357,98 +355,97 @@ When called in the `direct_select` and drawing modes no action is taken. The cur
 
 ### `.setFeatureProperty(String: featureId, String: property, Any: value) -> Draw`
 
-Sets the value of a property on the indicated feature. This is good if you are using Draw as your primary data store in your application.
+设置指定要素的属性值。
 
-## Events
+## 事件
 
-Draw fires off a number of events. All of these events are namespaced with `draw.` and are emitted from the map object.
+该对象提供了一系列的事件，所有的事件都是用 `draw.`进行命名D，并且都是通过map对象进行触发。
+所有的事件都是用户交互触发的结果。
 
-They are all triggered as the result of user interaction.
-
-**If you invoke a function in the Draw API, any event that *directly corresponds with* that function will not be fired.** For example, if you invoke `Draw.delete(..)`, there will be no corresponding `draw.delete` event, since you already know what you've done. Subsequent events may fire, though, that do not directly correspond to the invoked function. For example, if you have a one feature selected and then invoke `Draw.changeMode('draw_polygon')`, you will *not* see a `draw.modechange` event (because that directly corresponds with the invoked function) but you *will* see a `draw.selectionchange` event, since by changing the mode you deselected a feature.
+**如果你通过以上的API引入一个函数，那么他不会触发与这个函数 *直接相关联* 的任何事件。例如，如果你引用了`Draw.delete(..)`，将不会触发相关联的 `draw.delete` 事件，因为你已经知道你做了什么。但是由之引起的其他事件将会被触发，这些事件并不与引用的函数直接相关联。例如，你选中了一个要素，并且调用了`Draw.changeMode('draw_polygon')`，你将 *不会* 看到 `draw.modechange` 事件（因为它与调用的函数直接相关联），但是你 *会* 看到一个 `draw.selectionchange` 事件，因为你的操作引起了选中要素的变化。
 
 ### `draw.create`
 
-Fired when a feature is created. The following will trigger this event:
+当要素被创建时触发，下列操作将会触发该事件：
 
-- Finish drawing a feature. Simply clicking will create a Point. A LineString or Polygon is only created when the user has finished drawing it — i.e. double-clicked the last vertex or hit Enter — and the drawn feature is valid.
+- 要素绘制完成的时候。线和面要素只在用户完成绘制时触发，也就是双击或者按回车，并且绘制的要素有效时。 
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  // Array of GeoJSON objects representing the features that were created
+  // 包含所创建的要素的一个GeoJSON对象数组
   features: Array<Object>
 }
 ```
 
 ### `draw.delete`
 
-Fired when one or more features are deleted. The following will trigger this event:
+当一个或多个要素被删除时触发。下列操作将会触发该事件：
 
-- Click the Trash button when one or more features are selected in `simple_select` mode.
-- Hit the Backspace or Delete keys when one or features are selected in `simple_select` mode.
-- Invoke `Draw.trash()` when you have a feature selected in `simple_select` mode.
+- 在 `simple_select` 模式选中了一个或多个要素时，点击“删除”按钮。
+- 在 `simple_select` 模式选中了一个或多个要素时，按下退格键或删除键。
+- 在 `simple_select` 模式选中了一个要素，调用 `Draw.trash()` 函数。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  // Array of GeoJSON objects representing the features that were deleted
+  // 包含所删除的要素的一个GeoJSON对象数组
   features: Array<Object>
 }
 ```
 
 ### `draw.combine`
 
-Fired when features are combined. The following will trigger this event:
+当要素聚合时触发。下列操作将会触发该事件：
 
-- Click the Combine button when more than one features are selected in `simple_select` mode.
-- Invoke `Draw.combineFeatures()` when you have more than one features selected in `simple_select` mode.
+- 在 `simple_select` 模式选中了多个要素时，点击聚合按钮。
+- 在 `simple_select` 模式选中了多个要素时，调用 `Draw.combineFeatures()` 函数。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  deletedFeatures: Array<Object>, // Array of GeoJSON objects representing the features that were deleted
-  createdFeatures: Array<Object> // Array of GeoJSON objects representing the multifeature that has been created
+  deletedFeatures: Array<Object>, // 包含所删除的要素的一个GeoJSON对象数组
+  createdFeatures: Array<Object> // 包含所创建的要素的一个GeoJSON对象数组
 }
 ```
 
 ### `draw.uncombine`
 
-Fired when features are uncombined. The following will trigger this event:
+当要素分离时触发。下列操作将会触发该事件：
 
-- Click the Uncombine button when one or more multifeatures are selected in `simple_select` mode. Non multifeatures may also be selected.
-- Invoke `Draw.uncombineFeatures()` when you have one or more multifeatures selected in `simple_select` mode. Non multifeatures may also be selected.
+- 在 `simple_select` 模式选中了一个或多个要素集合（FeatureCollection）时，点击分离按钮。
+- 在 `simple_select` 模式选中了一个或多个要素集合（FeatureCollection）时，调用 `Draw.uncombineFeatures()` 函数。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  deletedFeatures: Array<Object>, // Array of GeoJSON objects representing the multifeatures that were deleted
-  createdFeatures: Array<Object> // Array of GeoJSON objects representing the single features that have been created
+  deletedFeatures: Array<Object>, // 包含所删除的要素的一个GeoJSON对象数组
+  createdFeatures: Array<Object> // 包含所创建的要素的一个GeoJSON对象数组
 }
 ```
 
 ### `draw.update`
 
-Fired when one or more features are updated. The following will trigger this event, which can be subcategorized by `action`:
+当一个或多个要素更新时触发。下列操作将会触发该事件，可以被归类为 `action` ：
 
 - `action: 'move'`
-  - Finish moving one or more selected features in `simple_select` mode. The event will only fire when the movement is finished — i.e. when the user releases the mouse button or hits Enter.
+  - 在 `simple_select` 模式移动一个或多个要素时。事件只会在操作完成时触发——用户释放鼠标或按下回车。
 - `action: 'change_coordinates'`
-  - Finish moving one or more vertices of a selected feature in `direct_select` mode. The event will only fire when the movement is finished — i.e. when the user releases the mouse button or hits Enter, or her mouse leaves the map container.
-  - Delete one or more vertices of a selected feature in `direct_select` mode, which can be done by hitting the Backspace or Delete keys, clicking the Trash button, or invoking `Draw.trash()`.
-  - Add a vertex to the selected feature by clicking a midpoint on that feature in `direct_select` mode.
+  - 在 `direct_select` 模式移动要素的一个或多个顶点。事件只会在操作完成时触发——用户释放鼠标或按下回车或者鼠标离开地图区域。
+  - 在 `direct_select` 模式删除要素的一个或多个顶点，可以通过按下退格键或删除键、点击删除按钮、调用 `Draw.trash()` 触发。
+  - 在 `direct_select` 模式通过点击要素的中点添加一个顶点。
 
-This event will not fire when a feature is created or deleted. To track those interactions, listen for `draw.create` and `draw.delete`.
+当要素被创建或删除时不会触发该事件，如果需要跟踪这些交互，可以监听 `draw.create` 或 `draw.delete`事件。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  // Array of GeoJSON objects representing the features that were updated
+  // 包含所更新的要素的一个GeoJSON对象数组
   features: Array<Object>,
   action: string
 }
@@ -456,60 +453,59 @@ The event data is an object with the following shape:
 
 ### `draw.selectionchange`
 
-Fired when the selection is changed (one or more features are selected or deselected). The following will trigger this event:
+当选中要素发生变更时触发。下列操作将会触发该事件：
 
-- Click on a feature to select it.
-- When a feature is already selected, shift-click on another feature to add it to the selection.
--Click on a vertex to select it.
-- When a vertex is already selected, shift-click on another vertex to add it to the selection.
-- Create a box-selection that includes at least one feature.
-- Click outside the selected feature(s) to deselect.
-- Click away from the selected vertex(s) to deselect.
-- Finish drawing a feature (features are selected just after they are created).
-- When a feature is already selected, invoke `Draw.changeMode()` such that the feature becomes deselected.
-- Use `Draw.changeMode('simple_select', { featureIds: [..] })` to switch to `simple_select` mode and immediately select the specified features.
-- Use `Draw.delete`, `Draw.deleteAll` or `Draw.trash` to delete feature(s).
+- 点击一个要素选中。
+- 当一个要素已经被选中，按住shift键选中另一个要素。
+- 点击选中一个顶点
+- 当一个顶点已经被选中，按住shift键选中另一个顶点。
+- 创建一个选择框，至少包含一个要素。
+- 在选中要素的外面点击，取消选中。
+- 在选中顶点的外面点击，取消选中。
+- 一个要素绘制完成时（要素绘制完成以后直接处于选中状态）
+- 选中了一个要素以后，调用 `Draw.changeMode()` 导致要素取消选中。
+- 使用 `Draw.changeMode('simple_select', { featureIds: [..] })` 切换到 `simple_select` 模式并且指定选中的要素。
+- 使用 `Draw.delete`, `Draw.deleteAll` 或者 `Draw.trash` 删除要素。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  // Array of GeoJSON objects representing the features
-  // that are selected, after the change
+  // 包含选中要素的GeoJSON对象数组
   features: Array<Object>
 }
 ```
 
 ### `draw.modechange`
 
-Fired when the mode is changed. The following will trigger this event:
+模式发生改变时触发。下列操作将会触发该事件：
 
-- Click the point, line, or polygon buttons to begin drawing (enter a `draw_*` mode).
-- Finish drawing a feature (enter `simple_select` mode).
-- While in `simple_select` mode, click on an already selected feature (enter `direct_select` mode).
-- While in `direct_select` mode, click outside all features (enter `simple_select` mode).
+- 点击绘图按钮开始绘制时 (进入 `draw_*` 模式)。
+- 绘图完成时 (进入 `simple_select` 模式).
+- 当处于`simple_select` 模式时，点击一个已经选中的要素(进入 `direct_select` 模式).
+- 当处于 `direct_select` 模式时，点击要素外部(进入 `simple_select` 模式)。
 
-This event is fired just after the current mode stops and just before the next mode starts. A render will not happen until after all event handlers have been triggered, so you can force a mode redirect by calling `Draw.changeMode()` inside a `draw.modechange` handler.
+该事件仅仅在当前模式结束之后，新的模式开始之前触发。渲染在所有的事件处理函数触发完成后才会开始，因此可以在`draw.modechange` 处理函数中调用 `Draw.changeMode()` 来强制更改模式。
 
-The event data is an object with the following shape:
+事件传递的数据是一个包含以下形状的对象：
 
 ```js
 {
-  // The next mode, i.e. the mode that Draw is changing to
+  // 接下来的模式，也就是将会切换到该模式下
   mode: string
 }
 ```
 
-`simple_select` and `direct_select` modes can be initiated with options specific to that mode (see above).
+`simple_select` 模式 `direct_select` 模式可以通过选项指定要素进行初始化。
 
 ### `draw.render`
 
-Fired just after Draw calls `setData()` on `mapbox-gl-js`. This does not imply that the set data call has updated the map, just that the map is being updated.
+仅仅在调用 `setData()`时触发。这并不代表已经更新了地图，只是地图将会被更新。
 
 
 ### `draw.actionable`
 
-Fired as the state of Draw changes to enable and disable different actions. Following this event will enable you know if `Draw.trash()`, `Draw.combineFeatures()` and `Draw.uncombineFeatures()` will have an effect.
+当Draw的状态发生改变时触发。监听该事件可以获知 `Draw.trash()`, `Draw.combineFeatures()` 和`Draw.uncombineFeatures()` 是否已经生效。
 
 ```js
 {
@@ -521,42 +517,42 @@ Fired as the state of Draw changes to enable and disable different actions. Foll
 }
 ```
 
-## Styling Draw
+## 自定义样式
 
-Draw is styled by the [Mapbox GL Style Spec](https://www.mapbox.com/mapbox-gl-style-spec/) with a preset list of properties.
+Draw使用的是 [Mapbox GL Style Spec](https://www.mapbox.com/mapbox-gl-style-spec/)，并且通过预先设定的属性进行过滤来进设置样式。
 
 **source**
 
-The `GL Style Spec` requires each layer to have a source. **DO NOT PROVIDE THIS** for styling draw.
+ `GL Style Spec` 需要每一个图层都有一个数据源，当你需要自定义样式时，**不需要在图层中提供数据源** 
 
-Draw moves features between sources for performance gains, because of this it is recommended that you **DO NOT** provide a source for a style despite the fact the `GL Style Spec` requires a source. **Draw will provide the source for you automatically**.
+Draw会在不同的数据源之间移动要素以保证性能，正因为如此，建议你 **不要** 在样式中提供数据源，尽管 `GL Style Spec` 要求必须提供数据源。 **Draw会自动为你提供数据源**.
 
-If you need to style gl-draw for debugging sources the source names are `mapbox-gl-draw-hot` and `mapbox-gl-draw-cold`.
+Draw提供的数据源的名称为 `mapbox-gl-draw-hot` 和 `mapbox-gl-draw-cold`，如果你需要调整数据源，你可以使用该名称。
 
 **id**
 
-The `GL Style Spec` also requires an id. **YOU MUST PROVIDE THIS**.
+ `GL Style Spec` 同样需要提供一个id， **你必须提供这个id**。
 
-Draw will add `.hot` and `.cold` to the end of your id.
+Draw将会自动添加`.hot` 和 `.cold` 到你提供的id后面。
 
-property | values | function
+属性 | 值 | 功能介绍
 --- | --- | ---
-meta | feature, midpoint, vertex | `midpoint` and `vertex` are used on points added to the map to communicate polygon and line handles. `feature` is used for all features added by the user.
-active | true, false | A feature is active when it is 'selected' in the current mode. `true` and `false` are strings.
-mode |  simple_select, direct_select, draw_point, draw_line_string, draw_polygon, static | Indicates which mode Draw is currently in.
+meta | feature, midpoint, vertex | `midpoint` 和 `vertex` 被用在连接线和多边形的节点上， `feature` 用于用户添加的所有要素中。
+active | true, false | 当要素在当前模式下被选中时处于激活状态。`true` 和 `false` 是字符串类型。
+mode |  simple_select, direct_select, draw_point, draw_line_string, draw_polygon, static, ··· | 表示当前所处的模式
 
-Draw also provides a few more properties, but they should not be used for styling. For details on them, see `Using Draw with map.queryRenderFeatures`.
+Draw还提供一些其他的属性，但是不建议用来进行设置样式。更多详情可查看 `通过map.queryRenderFeatures使用Draw`.
 
 ### Example Custom Styles
 
-See [EXAMPLES.md](https://github.com/mapbox/mapbox-gl-draw/blob/master/EXAMPLES.md) for examples of custom styles.reference.
+See [EXAMPLES.md](https://github.com/wanyanyan/gl-draw-foxgis/blob/master/EXAMPLES.md) for examples of custom styles.reference.
 
-## Using Draw with `map.queryRenderFeatures`
+## 通过 `map.queryRenderFeatures`使用Draw
 
-property | values | function
+属性 | 值类型 | 功能介绍
 --- | --- | ---
-id | string | only available when `meta` is `feature`
-parent | string | only avaible when `meta` is not `feature`
-coord_path | string | a `.` seporated path to one [lon, lat] entity in the parents coordinates
-lon | number | the longitude value of a handle. Only available when `meta` is `midpoint`.
-lat | number | the latitude value of a handle. Only available when `meta` is `midpoint`.
+id | string | 只有当 `meta` 值为 `feature`时才有
+parent | string | 只有当 `meta` 值不为 `feature`时才有
+coord_path | string | 用 `.` 分隔的 [lon, lat] 实体
+lon | number | 经度值，只有当 `meta` 值为 `midpoint`时才有
+lat | number | 纬度值，只有当 `meta` 值为 `midpoint`时才有

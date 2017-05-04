@@ -1,6 +1,6 @@
 # gl-draw-foxgis.js
 
-基于 [mapbox-gl-draw](https://github.com/mapbox/mapbox-gl-draw) 0.16.0版本修改，支持在 [mapbox-gl.js](https://www.mapbox.com/mapbox-gl-js/) 地图中添加和编辑要素，除了添加点、线、面以外，支持在地图上绘制曲线、圆弧、圆、矩形、箭头等形状.
+基于 [mapbox-gl-draw](https://github.com/mapbox/mapbox-gl-draw) 0.16.0版本修改，支持在 [mapbox-gl.js](https://www.mapbox.com/mapbox-gl-js/) 地图中添加和编辑要素，除了添加点、线、面以外，支持在地图上绘制Bezier曲线、圆弧、圆、矩形、三角形、箭头、弯曲箭头等形状.
 
 ### 安装
 
