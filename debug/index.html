@@ -33,7 +33,7 @@
 </head>
 <body>
 <div id='map'></div>
-<div class='start-draw' >
+<div class='start-draw'>
   <div id='start-point'>点</div>
   <div id='start-line'>线</div>
   <div id='start-polygon'>多边形</div>
@@ -74,7 +74,7 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     zoom: args.zoom || 1,
     center: args.latlng || [0, 0],
     /*style: 'mapbox://styles/mapbox/streets-v8'*/
-    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imdlb3dheSIsImlhdCI6MTQ4MjIwNjQwMywiZXhwIjoxNDgyODExMjAzfQ.8Ve_DID9NKXy489h1t4VXHD-SVge52PXkwSGsv3jFJ0'
+    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imdlb3dheSIsImlhdCI6MTQ5Mzg2NTE3NCwiZXhwIjoxNDk0NDY5OTc0fQ.irwYb-3heEuMfXNrEUmEUYPjBZ9gIca2IsIVOaRna2U'
   });
 
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');

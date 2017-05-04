@@ -13,7 +13,7 @@ var Arrow = function(ctx, geojson) {
 
 Arrow.prototype = new Polygon();
 
-//绘制p1,p2两个点后，根据鼠标位置p3计算矩形的另外两个点的位置
+//p1为箭头起点，p2为箭头终点
 Arrow.prototype.getArrowVertex = function(ctx,p1,p2) {
 	var coord=[];
 	coord[0] = [p1.x,p1.y];//起点

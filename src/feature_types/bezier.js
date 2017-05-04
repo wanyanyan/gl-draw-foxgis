@@ -8,7 +8,7 @@ var Bezier = function(ctx, geojson) {
 
 Bezier.prototype = new LineString();
 
-//根据p1,p2,p3三个点确定圆弧坐标
+//points_x为x坐标数组，points_y为y坐标数组，数组长度表示曲线的维度
 Bezier.prototype.getBezierVertex = function(ctx,points_x,points_y) {
 	var bezierVertex = [];
 	for (var t = 0; t < 1; t += 0.01) {
