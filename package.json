@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "bezier": "^0.1.0",
-    "bezier-spline": "github:freder/bezier-spline",
+    "bezier-spline": "github:wanyanyan/bezier-spline",
     "geojson-area": "^0.2.1",
     "geojson-extent": "^0.3.2",
     "geojson-normalize": "0.0.1",
