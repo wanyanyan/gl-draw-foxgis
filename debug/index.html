@@ -44,6 +44,8 @@
   <div id='start-arc'>圆弧</div>
   <div id='start-bezier'>曲线</div>
   <div id='start-bezier_arrow'>曲线箭头</div>
+  <div id='start-line-with-label'>带线标注</div>
+  <div id='start-label-line'>沿线标注</div>
 </div>
 <div class='toggle'>
   <button id='addBtn'>add draw</button>
@@ -72,10 +74,10 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
   var map = new mapboxgl.Map({
     container: 'map',
-    zoom: args.zoom || 1,
-    center: args.latlng || [0, 0],
+    zoom: args.zoom || 3,
+    center: args.latlng || [116, 30],
     /*style: 'mapbox://styles/mapbox/streets-v8'*/
-    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imdlb3dheSIsImlhdCI6MTQ5Mzg2NTE3NCwiZXhwIjoxNDk0NDY5OTc0fQ.irwYb-3heEuMfXNrEUmEUYPjBZ9gIca2IsIVOaRna2U'
+    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndhbnlhbnlhbiIsImlhdCI6MTQ5NjYzMDU3NywiZXhwIjoxNDk3MjM1Mzc3fQ.d-D9z_yC-jvbq5G8wXxqP1umvswbq6dhfq61SCI5Kro'
   });
 
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');
@@ -117,6 +119,8 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startArc = document.getElementById('start-arc');
     var startBezier = document.getElementById('start-bezier');
     var startBezierArrow = document.getElementById('start-bezier_arrow');
+    var startLineWithLabel = document.getElementById('start-line-with-label');
+    var startLabelLine = document.getElementById('start-label-line');
 
 
     startPoint.onclick = function() {
@@ -158,6 +162,14 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     startBezierArrow.onclick = function() {
       Draw.changeMode('draw_bezier_arrow');
     };
+
+    startLineWithLabel.onclick = function() {
+      Draw.changeMode('draw_line_with_label');
+    }
+
+    startLabelLine.onclick = function() {
+      Draw.changeMode('draw_label_line');
+    }
 
   });
 

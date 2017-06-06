@@ -1,15 +1,15 @@
 const CommonSelectors = require('../lib/common_selectors');
-const Bezier = require('../feature_types/bezier');
+const BezierSpline = require('../feature_types/bezier_spline');
 const isEventAtCoordinates = require('../lib/is_event_at_coordinates');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const Constants = require('../constants');
 const createVertex = require('../lib/create_vertex');
 
 module.exports = function(ctx) {
-  const bezier = new Bezier(ctx, {
+  const bezier = new BezierSpline(ctx, {
     type: Constants.geojsonTypes.FEATURE,
     properties: {
-      type:Constants.featureTypes.BEZIER
+      type:Constants.featureTypes.LABEL_LINE
     },
     geometry: {
       type: Constants.geojsonTypes.LINE_STRING,
@@ -17,9 +17,10 @@ module.exports = function(ctx) {
     }
   });
   var currentVertexPosition = 0;
-  //每点击一次，获取点击的坐标，x、y分开存储
-  var points_x = new Array(3);
-  var points_y = new Array(3);
+  var stableVertex = []; //已经固定的曲线坐标
+  var bezierVertex = []; //曲线所有的坐标
+  //每点击一次，获取点击的坐标，只保存后三个点
+  var points = new Array(3);
 
   if (ctx._test) ctx._test.line = bezier;
 
@@ -32,19 +33,14 @@ module.exports = function(ctx) {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       ctx.ui.setActiveButton(Constants.types.LINE);
       this.on('mousemove', CommonSelectors.true, function(e){
-        if(currentVertexPosition === 2){//两个点时计算Bezier曲线
+        if(currentVertexPosition >= 2){//两个点时计算Bezier曲线
           var p = ctx.map.project(e.lngLat);
-          points_x[1] = p.x;
-          points_y[1] = p.y;
-          var bezierVertex = bezier.getBezierVertex(ctx,points_x,points_y);
-          if(bezierVertex){
+          points[2] = ([p.x,p.y,0]);
+          var vertex = bezier.getBezierVertex(ctx,points);
+          if(vertex){
+            bezierVertex = stableVertex.concat(vertex.section1).concat(vertex.section2);
             bezier.setCoordinates(bezierVertex);
           }
-        }else if(currentVertexPosition === 3){//三个点时绘制完毕
-          ctx.map.fire(Constants.events.CREATE, {
-            features: [bezier.toGeoJSON()]
-          });
-          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
         }else if(currentVertexPosition === 1){
           bezier.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         }
@@ -53,24 +49,26 @@ module.exports = function(ctx) {
         }
       });
       this.on('click', CommonSelectors.true, function(e){
-        if (currentVertexPosition > 0 && isEventAtCoordinates(e, bezier.coordinates[currentVertexPosition - 1])) {
+        if (currentVertexPosition >= 2 && isEventAtCoordinates(e, bezier.coordinates[bezierVertex.length - 1])) {
           return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
         if (currentVertexPosition < 2){
           bezier.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
+        }else {
+          bezier.updateCoordinate(bezierVertex.length - 1, e.lngLat.lng, e.lngLat.lat);
         }
         var p = ctx.map.project(e.lngLat);
-        if (currentVertexPosition === 0) {//第一个点，起点
-          points_x[0] = p.x;
-          points_y[0] = p.y;
-        } else if (currentVertexPosition === 1) {//第二个点，终点
-          points_x[2] = p.x;
-          points_y[2] = p.y;
-        } else if (currentVertexPosition === 2) {//第三个点
-          points_x[1] = p.x;
-          points_y[1] = p.y;
+        if(currentVertexPosition >= 2) {
+          points[2] =  [p.x,p.y,0];
+          var vertex = bezier.getBezierVertex(ctx,points);
+          stableVertex = stableVertex.concat(vertex.section1);
         }
+        if(points[1]) {
+          points[0] = points[1];
+        }
+        points[1] = [p.x,p.y,0];
+
         currentVertexPosition++;
       });
       this.on('click', CommonSelectors.isVertex, function(){

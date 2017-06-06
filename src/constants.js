@@ -60,6 +60,9 @@ module.exports = {
     DRAW_ARC: 'draw_arc',
     DRAW_BEZIER: 'draw_bezier',
     DRAW_BEZIER_ARROW: 'draw_bezier_arrow',
+    DRAW_DOVETAIL_ARROW: 'draw_dovetail_arrow',
+    DRAW_LINE_WITH_LABEL: 'draw_line_with_label',
+    DRAW_LABEL_LINE: 'draw_label_line',
     SIMPLE_SELECT: 'simple_select',
     DIRECT_SELECT: 'direct_select',
     STATIC: 'static'
@@ -95,7 +98,10 @@ module.exports = {
     CIRCLE:'circle',
     RECTANGLE:'rectangle',
     TRIANGLE:'triangle',
-    BEZIER_ARROW:'bezier_arrow'
+    BEZIER_ARROW:'bezier_arrow',
+    DOVETAIL_ARROW:'dovetail_arrow',
+    LABEL_POINT: 'label_point',
+    LABEL_LINE: 'label_line'
   },
   activeStates: {
     ACTIVE: 'true',

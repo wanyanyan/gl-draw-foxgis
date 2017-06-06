@@ -44,7 +44,7 @@ module.exports = [
     'type': 'line',
     'filter': ['all',
       ['==', 'active', 'false'],
-      ['==', '$type', 'LineString'],
+      ['==', 'type', 'line'],
       ['!=', 'mode', 'static']
     ],
     'layout': {
@@ -105,7 +105,7 @@ module.exports = [
     'type': 'circle',
     'filter': ['all',
       ['==', 'active', 'false'],
-      ['==', '$type', 'Point'],
+      ['==', 'type', 'point'],
       ['==', 'meta', 'feature'],
       ['!=', 'mode', 'static']
     ],
@@ -120,7 +120,7 @@ module.exports = [
     'type': 'circle',
     'filter': ['all',
       ['==', 'active', 'false'],
-      ['==', '$type', 'Point'],
+      ['==', 'type', 'point'],
       ['==', 'meta', 'feature'],
       ['!=', 'mode', 'static']
     ],
@@ -133,7 +133,7 @@ module.exports = [
     'id': 'gl-draw-point-stroke-active',
     'type': 'circle',
     'filter': ['all',
-      ['==', '$type', 'Point'],
+      ['==', 'type', 'point'],
       ['==', 'active', 'true'],
       ['==', 'meta', 'feature']
     ],
@@ -146,7 +146,7 @@ module.exports = [
     'id': 'gl-draw-point-active',
     'type': 'circle',
     'filter': ['all',
-      ['==', '$type', 'Point'],
+      ['==', 'type', 'point'],
       ['==', 'meta', 'feature'],
       ['==', 'active', 'true']],
     'paint': {
@@ -193,7 +193,7 @@ module.exports = [
   {
     'id': 'gl-draw-point-static',
     'type': 'circle',
-    'filter': ['all', ['==', 'mode', 'static'], ['==', '$type', 'Point']],
+    'filter': ['all', ['==', 'mode', 'static'], ['==', 'type', 'point']],
     'paint': {
       'circle-radius': 5,
       'circle-color': '#404040'
@@ -240,6 +240,80 @@ module.exports = [
     'paint': {
       'line-color': '#fbb03b',
       'line-dasharray': [0.2, 2],
+      'line-width': 2
+    }
+  },
+  {
+    'id': 'gl-draw-label-point',
+    'type': 'symbol',
+    'filter': ['all', ['==', 'type', 'label_point'],['==', 'meta', 'feature']],
+    "layout": {
+      "symbol-placement": "point",
+      "text-field": "带线标注",
+      "text-font": [
+        "SimHei Regular"
+      ],
+      "text-size": 14,
+      "text-anchor": "left",
+      "text-offset": [0.5,-0.5],
+      "text-allow-overlap": true,
+      "text-ignore-placement": true
+    },
+    "paint": {
+      "text-color": "#000000"
+    }
+  },
+  {
+    'id': 'gl-draw-label-line',
+    'type': 'symbol',
+    'filter': ['==', 'type', 'label_line'],
+    "layout": {
+      "symbol-placement": "line",
+      "text-letter-spacing": 1,
+      "symbol-spacing": 150,
+      "text-field": "沿线标注",
+      "text-font": [
+        "SimHei Regular"
+      ],
+      "text-size": 14,
+      "text-allow-overlap": true,
+      "text-ignore-placement": true
+    },
+    "paint": {
+      "text-color": "#000000"
+    }
+  },
+  {
+    'id': 'gl-draw-arc-inactive',
+    'type': 'line',
+    'filter': ['all',
+      ['==', 'active', 'false'],
+      ['==', 'type', 'arc'],
+      ['!=', 'mode', 'static']
+    ],
+    'layout': {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    'paint': {
+      'line-color': '#3bb2d0',
+      'line-width': 2
+    }
+  },
+  {
+    'id': 'gl-draw-bezier-inactive',
+    'type': 'line',
+    'filter': ['all',
+      ['==', 'active', 'false'],
+      ['==', 'type', 'bezier'],
+      ['!=', 'mode', 'static']
+    ],
+    'layout': {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    'paint': {
+      'line-color': '#3bb2d0',
       'line-width': 2
     }
   }

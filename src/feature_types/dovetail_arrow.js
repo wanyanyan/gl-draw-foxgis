@@ -1,24 +1,27 @@
 var Feature = require('./feature');
 var Polygon = require('./polygon');
-var innerOffset = 5;
-var outerOffset = 11;
-var topOffset = 18;
-var template = [[0,0],[5,82],[11,82],[0,100],[-11,82],[-5,82],[0,0]];
-var base = 100;
+var topOffset = 15;
+var topInnerOffset = 5;
+var topOuterOffset = 10;
+var bottomOffset = 15;
+var bottomOuterOffset = 15;
 
-var Arrow = function(ctx, geojson) {
+/*var template = [[0,0],[5,82],[11,82],[0,100],[-11,82],[-5,82],[0,0]];
+var base = 100;*/
+
+var DovetailArrow = function(ctx, geojson) {//燕尾箭头
   Feature.call(this, ctx, geojson);
   this.coordinates = this.coordinates.map(function(ring){return ring.slice(0, -1)});
 };
 
-Arrow.prototype = new Polygon();
+DovetailArrow.prototype = new Polygon();
 
 //p1为箭头起点，p2为箭头终点
-Arrow.prototype.getArrowVertex = function(ctx,p1,p2) {
+DovetailArrow.prototype.getArrowVertex = function(ctx,p1,p2) {
 	var coord = [];
-	coord[0] = [p1.x,p1.y];//起点
-	coord[3] = [p2.x,p2.y];//顶点
-	var p1_p2 = Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));//p1-p2的距离
+	coord[0] = [p1.x, p1.y];//起点
+	coord[3] = [p2.x, p2.y];//顶点
+	var p1_p2 = Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y));//p1-p2的距离
 	if(p1_p2 === 0){
 		return;
 	}
@@ -32,6 +35,7 @@ Arrow.prototype.getArrowVertex = function(ctx,p1,p2) {
 	//外转点的原始坐标（左边）
 	var lOuterx = p1.x+outerOffset;
 	var lOutery = p1.y+p1_p2-topOffset;
+
 	var rInnerx = p1.x-innerOffset;
 	var rInnery = p1.y+p1_p2-topOffset;
 	var rOuterx = p1.x-outerOffset;
@@ -50,4 +54,4 @@ Arrow.prototype.getArrowVertex = function(ctx,p1,p2) {
 	return coord;
 };
 
-module.exports = Arrow;
+module.exports = DovetailArrow;
