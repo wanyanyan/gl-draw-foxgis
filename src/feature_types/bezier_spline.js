@@ -1,7 +1,7 @@
 var Feature = require('./feature');
 var LineString = require('./line_string');
 var BezierJs = require('bezier');
-var BezierSpline = require('@freder/bezier-spline');
+var BezierSpline = require('bezier-spline');
 
 var Bezier = function(ctx, geojson) {
 	if(ctx && geojson) {
