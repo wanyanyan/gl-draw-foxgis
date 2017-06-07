@@ -86,10 +86,11 @@ module.exports = function(ctx) {
       line.removeCoordinate(String(currentVertexPosition));
       if (line.isValid()) {
         ctx.map.fire(Constants.events.CREATE, {
-          features: [line.toGeoJSON()]
+          features: [line.toGeoJSON(), point.toGeoJSON()]
         });
       } else {
         ctx.store.delete([line.id], { silent: true });
+        ctx.store.delete([point.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, {}, { silent: true });
       }
     },

@@ -264,26 +264,6 @@ module.exports = [
     }
   },
   {
-    'id': 'gl-draw-label-line',
-    'type': 'symbol',
-    'filter': ['==', 'type', 'label_line'],
-    "layout": {
-      "symbol-placement": "line",
-      "text-letter-spacing": 1,
-      "symbol-spacing": 150,
-      "text-field": "沿线标注",
-      "text-font": [
-        "SimHei Regular"
-      ],
-      "text-size": 14,
-      "text-allow-overlap": true,
-      "text-ignore-placement": true
-    },
-    "paint": {
-      "text-color": "#000000"
-    }
-  },
-  {
     'id': 'gl-draw-arc-inactive',
     'type': 'line',
     'filter': ['all',

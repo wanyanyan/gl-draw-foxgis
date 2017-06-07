@@ -17,7 +17,7 @@ module.exports = function(event, bbox, ctx) {
   const box = (event) ? mapEventToBoundingBox(event, ctx.options.clickBuffer) : bbox;
 
   var queryParams = {};
-  if (ctx.options.styles) queryParams.layers = ctx.options.styles.map(function(s){return s.id});
+  /*if (ctx.options.styles) queryParams.layers = ctx.options.styles.map(function(s){return s.id});*/
 
   var features = ctx.map.queryRenderedFeatures(box, queryParams)
     .filter(function(feature) {

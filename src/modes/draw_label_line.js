@@ -49,6 +49,52 @@ module.exports = function(ctx) {
         }
       });
       this.on('click', CommonSelectors.true, function(e){
+        if(currentVertexPosition == 0) {
+          var layer1 = {
+            'id': bezier.id + '_hot',
+            'type': 'symbol',
+            'filter': ["all",['==', 'type', 'label_line'], ["==","id",bezier.id]],
+            'source':"mapbox-gl-draw-hot",
+            "layout": {
+              "symbol-placement": "line",
+              "text-letter-spacing": 1,
+              "symbol-spacing": 150,
+              "text-field": "沿线标注",
+              "text-font": [
+                "SimHei Regular"
+              ],
+              "text-size": 14,
+              "text-allow-overlap": true,
+              "text-ignore-placement": true
+            },
+            "paint": {
+              "text-color": "#000000"
+            }
+          }
+          var layer2 = {
+            'id': bezier.id + '_cold',
+            'type': 'symbol',
+            'filter': ["all",['==', 'type', 'label_line'], ["==","id",bezier.id]],
+            'source':"mapbox-gl-draw-cold",
+            "layout": {
+              "symbol-placement": "line",
+              "text-letter-spacing": 1,
+              "symbol-spacing": 150,
+              "text-field": "沿线标注",
+              "text-font": [
+                "SimHei Regular"
+              ],
+              "text-size": 14,
+              "text-allow-overlap": true,
+              "text-ignore-placement": true
+            },
+            "paint": {
+              "text-color": "#000000"
+            }
+          }
+          ctx.map.addLayer(layer1);
+          ctx.map.addLayer(layer2);
+        }
         if (currentVertexPosition >= 2 && isEventAtCoordinates(e, bezier.coordinates[bezierVertex.length - 1])) {
           return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier.id] });
         }
