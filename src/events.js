@@ -15,6 +15,7 @@ modes[Constants.modes.DRAW_ARC] = require('./modes/draw_arc');
 modes[Constants.modes.DRAW_BEZIER] = require('./modes/draw_bezier');
 modes[Constants.modes.DRAW_BEZIER_ARROW] = require('./modes/draw_bezier_arrow');
 modes[Constants.modes.DRAW_DOVETAIL_ARROW] = require('./modes/draw_dovetail_arrow');
+modes[Constants.modes.DRAW_BEZIER_DOVETAIL_ARROW] = require('./modes/draw_bezier_dovetail_arrow');
 modes[Constants.modes.DRAW_LINE_STRING] = require('./modes/draw_line_string');
 modes[Constants.modes.DRAW_POLYGON] = require('./modes/draw_polygon');
 modes[Constants.modes.DRAW_LINE_WITH_LABEL] = require('./modes/draw_line_with_label');

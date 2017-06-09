@@ -60,6 +60,7 @@ module.exports = {
     DRAW_ARC: 'draw_arc',
     DRAW_BEZIER: 'draw_bezier',
     DRAW_BEZIER_ARROW: 'draw_bezier_arrow',
+    DRAW_BEZIER_DOVETAIL_ARROW: 'draw_bezier_dovetail_arrow',
     DRAW_DOVETAIL_ARROW: 'draw_dovetail_arrow',
     DRAW_LINE_WITH_LABEL: 'draw_line_with_label',
     DRAW_LABEL_LINE: 'draw_label_line',
@@ -100,6 +101,7 @@ module.exports = {
     TRIANGLE:'triangle',
     BEZIER_ARROW:'bezier_arrow',
     DOVETAIL_ARROW:'dovetail_arrow',
+    BEZIER_DOVETAIL_ARROW: 'bezier_dovetail_arrow',
     LABEL_POINT: 'label_point',
     LABEL_LINE: 'label_line'
   },

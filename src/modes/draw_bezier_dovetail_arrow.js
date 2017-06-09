@@ -1,5 +1,5 @@
 const CommonSelectors = require('../lib/common_selectors');
-const DovetailArrow = require('../feature_types/dovetail_arrow');
+const BezierDovetailArrow = require('../feature_types/bezier_dovetail_arrow');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const Constants = require('../constants');
 const isEventAtCoordinates = require('../lib/is_event_at_coordinates');
@@ -7,7 +7,7 @@ const createVertex = require('../lib/create_vertex');
 
 module.exports = function(ctx) {
 
-  const arrow = new DovetailArrow(ctx, {
+  const bezier_arrow = new BezierDovetailArrow(ctx, {
     type: Constants.geojsonTypes.FEATURE,
     properties: {},
     geometry: {
@@ -16,14 +16,11 @@ module.exports = function(ctx) {
     }
   });
   var currentClickNum = 0;
-  var center = {
-    x:0,
-    y:0
-  }
+  var points = [];
 
-  if (ctx._test) ctx._test.polygon = arrow;
+  if (ctx._test) ctx._test.polygon = bezier_arrow;
 
-  ctx.store.add(arrow);
+  ctx.store.add(bezier_arrow);
 
   return {
     start:function(){
@@ -32,15 +29,20 @@ module.exports = function(ctx) {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       this.on('mousemove', CommonSelectors.true, function(e){
         if(currentClickNum === 1){
-          var arrowVertex = arrow.getArrowVertex(ctx,center,ctx.map.project(e.lngLat));
+          var arrowVertex = bezier_arrow.getArrowVertex(ctx,points[0],ctx.map.project(e.lngLat));
           if(arrowVertex){
-            arrow.setCoordinates([arrowVertex]);
+            bezier_arrow.setCoordinates([arrowVertex]);
           }
-        }else if(currentClickNum === 2){//结束
+        } else if (currentClickNum === 2) {
+          var arrowVertex = bezier_arrow.getArrowVertex(ctx,points[0],points[1],ctx.map.project(e.lngLat));
+          if(arrowVertex){
+            bezier_arrow.setCoordinates([arrowVertex]);
+          }
+        } else if(currentClickNum === 3){//结束
           ctx.map.fire(Constants.events.CREATE, {
-            features: [arrow.toGeoJSON()]
+            features: [bezier_arrow.toGeoJSON()]
           });
-          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arrow.id] });
+          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier_arrow.id] });
         }
         if (CommonSelectors.isVertex(e)) {
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
@@ -51,22 +53,22 @@ module.exports = function(ctx) {
           return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [circle.id] });
         }*/
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
-        if(currentClickNum === 0){
-          center = ctx.map.project(e.lngLat);
+        if(currentClickNum < 2){
+          points.push(ctx.map.project(e.lngLat));
           currentClickNum++;
-        }else if(currentClickNum === 1){
+        }else if(currentClickNum === 2){
           currentClickNum++;
         }
       });
       this.on('click', CommonSelectors.isVertex, function(){
-        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arrow.id] });
+        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier_arrow.id] });
       });
       this.on('keyup', CommonSelectors.isEscapeKey, function(){
         ctx.store.delete([arrow.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
       this.on('keyup', CommonSelectors.isEnterKey, function(){
-        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arrow.id] });
+        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [bezier_arrow.id] });
       });
       ctx.events.actionable({
         combineFeatures: false,
@@ -81,23 +83,23 @@ module.exports = function(ctx) {
       ctx.ui.setActiveButton();
 
       // check to see if we've deleted this feature
-      if (ctx.store.get(arrow.id) === undefined) return;
+      if (ctx.store.get(bezier_arrow.id) === undefined) return;
 
       /*//remove last added coordinate
       circle.removeCoordinate("0."+currentVertexPosition);*/
-      if (arrow.isValid()) {
+      if (bezier_arrow.isValid()) {
         ctx.map.fire(Constants.events.CREATE, {
-          features: [arrow.toGeoJSON()]
+          features: [bezier_arrow.toGeoJSON()]
         });
       }
       else {
-        ctx.store.delete([arrow.id], { silent: true });
+        ctx.store.delete([bezier_arrow.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, {}, { silent: true });
       }
     },
 
     render:function(geojson, callback) {
-      const isActivePolygon = geojson.properties.id === arrow.id;
+      const isActivePolygon = geojson.properties.id === bezier_arrow.id;
       geojson.properties.active = (isActivePolygon) ? Constants.activeStates.ACTIVE : Constants.activeStates.INACTIVE;
       if (!isActivePolygon) return callback(geojson);
 
@@ -142,7 +144,7 @@ module.exports = function(ctx) {
       });
     },
     trash:function() {
-      ctx.store.delete([arrow.id], { silent: true });
+      ctx.store.delete([bezier_arrow.id], { silent: true });
       ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
     }
   };

@@ -44,6 +44,8 @@
   <div id='start-arc'>圆弧</div>
   <div id='start-bezier'>曲线</div>
   <div id='start-bezier_arrow'>曲线箭头</div>
+  <div id='start-dovetail_arrow'>燕尾箭头</div>
+  <div id='start-bezier_dovetail_arrow'>曲线燕尾</div>
   <div id='start-line-with-label'>带线标注</div>
   <div id='start-label-line'>沿线标注</div>
 </div>
@@ -121,6 +123,8 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     var startBezierArrow = document.getElementById('start-bezier_arrow');
     var startLineWithLabel = document.getElementById('start-line-with-label');
     var startLabelLine = document.getElementById('start-label-line');
+    var startDoveTailArrow = document.getElementById('start-dovetail_arrow');
+    var startBezierDoveTailArrow = document.getElementById('start-bezier_dovetail_arrow');
 
 
     startPoint.onclick = function() {
@@ -171,6 +175,13 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
       Draw.changeMode('draw_label_line');
     }
 
+    startDoveTailArrow.onclick = function() {
+      Draw.changeMode('draw_dovetail_arrow');
+    }
+
+    startBezierDoveTailArrow.onclick = function() {
+      Draw.changeMode('draw_bezier_dovetail_arrow');
+    }
   });
 
   var loadData = function(uri) {
