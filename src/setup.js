@@ -63,7 +63,8 @@ module.exports = function(ctx) {
           type: Constants.geojsonTypes.FEATURE_COLLECTION,
           features: []
         },
-        type: 'geojson'
+        type: 'geojson',
+        projection: ctx.map._projection || 'EPSG:3857'
       });
 
       // hot features style
@@ -72,7 +73,8 @@ module.exports = function(ctx) {
           type: Constants.geojsonTypes.FEATURE_COLLECTION,
           features: []
         },
-        type: 'geojson'
+        type: 'geojson',
+        projection: ctx.map._projection || 'EPSG:3857'
       });
 
       ctx.options.styles.forEach(function(style){
