@@ -68,7 +68,7 @@ module.exports = function(ctx) {
               "text-ignore-placement": true
             },
             "paint": {
-              "text-color": "#fff000"
+              "text-color": "#ffff00"
             }
           }
           var layer2 = {
@@ -89,7 +89,7 @@ module.exports = function(ctx) {
               "text-ignore-placement": true
             },
             "paint": {
-              "text-color": "#fff000"
+              "text-color": "#ffff00"
             }
           }
           ctx.map.addLayer(layer1);
