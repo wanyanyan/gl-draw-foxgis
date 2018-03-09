@@ -16,7 +16,6 @@ module.exports = function(ctx) {
       coordinates: []
     }
   });
-  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
   var currentVertexPosition = 0;
   var points = [];
 
@@ -79,6 +78,7 @@ module.exports = function(ctx) {
     },
 
     stop:function(){
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       if (initialDoubleClickZoomState) {
         doubleClickZoom.enable(ctx);
       }

@@ -79,6 +79,7 @@ module.exports = function(ctx) {
 
     stop: function() {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.NONE });
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       doubleClickZoom.enable(ctx);
       ctx.ui.setActiveButton();
 

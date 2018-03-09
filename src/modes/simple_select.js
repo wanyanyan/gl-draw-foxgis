@@ -22,7 +22,6 @@ module.exports = function(ctx, options) {
   var canDragMove = false;
   var transformTarget = null;
   var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
-  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
 
   var location = '';
 
@@ -94,6 +93,7 @@ module.exports = function(ctx, options) {
 
   return {
     stop: function() {
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       if (initialDoubleClickZoomState) {
         doubleClickZoom.enable(ctx);
       }
@@ -136,6 +136,7 @@ module.exports = function(ctx, options) {
           ctx.store.clearSelected();
           wasSelected.forEach(function(id){_this.render(id)});
         }
+        var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
         if (initialDoubleClickZoomState) {
           doubleClickZoom.enable(ctx);
         }
@@ -211,6 +212,7 @@ module.exports = function(ctx, options) {
           // Deselect it
           ctx.store.deselect(featureId);
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
+          var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
           if (selectedFeatureIds.length === 1 && initialDoubleClickZoomState) {
             doubleClickZoom.enable(ctx);
           }

@@ -28,7 +28,6 @@ module.exports = function(ctx, opts) {
   var dragMoving = false;
   var canDragMove = false;
   var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
-  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
 
   var selectedCoordPaths = opts.coordPath ? [opts.coordPath] : [];
 
@@ -180,6 +179,7 @@ module.exports = function(ctx, opts) {
       });
     },
     stop: function() {
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       if (initialDoubleClickZoomState) {
         doubleClickZoom.enable(ctx);
       }

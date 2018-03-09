@@ -60,6 +60,7 @@ module.exports = function(ctx) {
     },
 
     stop:function(){
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       doubleClickZoom.enable(ctx);
       ctx.ui.setActiveButton();
 

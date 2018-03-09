@@ -16,7 +16,6 @@ module.exports = function(ctx) {
       coordinates: []
     }
   });
-  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
   var currentVertexPosition = 0;
   //每点击一次，获取点击的坐标，x、y分开存储
   var points_x = new Array(3);
@@ -92,6 +91,7 @@ module.exports = function(ctx) {
     },
 
     stop:function(){
+      var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
       if (initialDoubleClickZoomState) {
         doubleClickZoom.enable(ctx);
       }
