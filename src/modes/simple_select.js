@@ -22,6 +22,7 @@ module.exports = function(ctx, options) {
   var canDragMove = false;
   var transformTarget = null;
   var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
+  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
 
   var location = '';
 
@@ -93,7 +94,9 @@ module.exports = function(ctx, options) {
 
   return {
     stop: function() {
-      doubleClickZoom.enable(ctx);
+      if (initialDoubleClickZoomState) {
+        doubleClickZoom.enable(ctx);
+      }
     },
     start: function() {
       // Select features that should start selected,
@@ -133,7 +136,9 @@ module.exports = function(ctx, options) {
           ctx.store.clearSelected();
           wasSelected.forEach(function(id){_this.render(id)});
         }
-        doubleClickZoom.enable(ctx);
+        if (initialDoubleClickZoomState) {
+          doubleClickZoom.enable(ctx);
+        }
         stopExtendedInteractions();
       });
 
@@ -206,7 +211,7 @@ module.exports = function(ctx, options) {
           // Deselect it
           ctx.store.deselect(featureId);
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
-          if (selectedFeatureIds.length === 1 ) {
+          if (selectedFeatureIds.length === 1 && initialDoubleClickZoomState) {
             doubleClickZoom.enable(ctx);
           }
         // 按住shift，点击一个未选中的要素，执行选中

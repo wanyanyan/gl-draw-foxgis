@@ -17,6 +17,7 @@ module.exports = function(ctx) {
       coordinates: [[]]
     }
   });
+  var initialDoubleClickZoomState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
   var currentClickNum = 0;
   var center = {
     x:0,
@@ -79,7 +80,9 @@ module.exports = function(ctx) {
 
     stop: function() {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.NONE });
-      doubleClickZoom.enable(ctx);
+      if (initialDoubleClickZoomState) {
+        doubleClickZoom.enable(ctx);
+      }
       ctx.ui.setActiveButton();
 
       // check to see if we've deleted this feature
