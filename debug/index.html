@@ -54,7 +54,7 @@
   <button id='removeBtn'>remove draw</button>
   <button id='flipStyleBtn'>change style</button>
 </div>
-<script src='mapbox-gl-0.29.0.js'></script>
+<script src='mapbox-gl-dev_4490.js'></script>
 <script src='/gl-draw-foxgis.js'></script>
 <script type='text/javascript'>
 // making run more like github.com/mapbox/mapbox-gl-js
@@ -78,8 +78,8 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     container: 'map',
     zoom: args.zoom || 3,
     center: args.latlng || [116, 30],
-    /*style: 'mapbox://styles/mapbox/streets-v8'*/
-    style: 'http://192.98.100.122:8090/api/v1/styles/geoway/BkzBRozQg?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndhbnlhbnlhbiIsImlhdCI6MTQ5NjYzMDU3NywiZXhwIjoxNDk3MjM1Mzc3fQ.d-D9z_yC-jvbq5G8wXxqP1umvswbq6dhfq61SCI5Kro'
+    style: 'mapbox://styles/mapbox/streets-v8'
+    /*style: 'http://localhost:8090/api/v1/styles/gl-draw'*/
   });
 
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');

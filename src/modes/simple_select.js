@@ -20,7 +20,8 @@ module.exports = function(ctx, options) {
   var canBoxSelect = false;
   var dragMoving = false;
   var canDragMove = false;
-  var transformTarget = null
+  var transformTarget = null;
+  var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
 
   var location = '';
 
@@ -78,7 +79,9 @@ module.exports = function(ctx, options) {
       boxSelectElement = null;
     }
 
-    ctx.map.dragPan.enable();
+    if ((canDragMove || canBoxSelect) && initialDragPanState === true) {
+      ctx.map.dragPan.enable();
+    }
 
     boxSelecting = false;
     canBoxSelect = false;
@@ -147,6 +150,7 @@ module.exports = function(ctx, options) {
 
       // mousedown事件
       this.on('mousedown', CommonSelectors.true, function(e) {
+        initialDragPanState = ctx.map.dragPan.isEnabled();
         var isActiveFeature = CommonSelectors.isActiveFeature(e);
         var isControlPoint = CommonSelectors.isOfMetaType(Constants.meta.CONTROL)(e);
         if(!isActiveFeature&&!isControlPoint){

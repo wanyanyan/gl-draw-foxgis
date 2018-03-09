@@ -27,6 +27,7 @@ module.exports = function(ctx, opts) {
   var dragMoveLocation = opts.startPos || null;
   var dragMoving = false;
   var canDragMove = false;
+  var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
 
   var selectedCoordPaths = opts.coordPath ? [opts.coordPath] : [];
 
@@ -46,13 +47,16 @@ module.exports = function(ctx, opts) {
   };
 
   var startDragging = function(e) {
+    initialDragPanState = this.map.dragPan.isEnabled();
     ctx.map.dragPan.disable();
     canDragMove = true;
     dragMoveLocation = e.lngLat;
   };
 
   var stopDragging = function() {
-    ctx.map.dragPan.enable();
+    if (canDragMove && initialDragPanState === true) {
+      ctx.map.dragPan.enable();
+    }
     dragMoving = false;
     canDragMove = false;
     dragMoveLocation = null;
