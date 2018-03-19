@@ -43,8 +43,13 @@ module.exports = function(ctx) {
       ctx.ui.setActiveButton(Constants.types.LINE);
       this.on('mousemove', CommonSelectors.true, function(e){
         line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
-        if(currentVertexPosition > 0) {
+        if(currentVertexPosition === 1) {
           point.updateCoordinate('', e.lngLat.lng, e.lngLat.lat);
+        }else if(currentVertexPosition === 2){//结束
+          ctx.map.fire(Constants.events.CREATE, {
+            features: [point.toGeoJSON(), line.toGeoJSON()]
+          });
+          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
         }
         if (CommonSelectors.isVertex(e)) {
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
@@ -52,21 +57,21 @@ module.exports = function(ctx) {
       });
       this.on('click', CommonSelectors.true, function(e){
         if(currentVertexPosition > 0 && isEventAtCoordinates(e, line.coordinates[currentVertexPosition - 1])) {
-          return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
+          return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
         line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         currentVertexPosition++;
       });
       this.on('click', CommonSelectors.isVertex, function(){
-        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
+        return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
       });
       this.on('keyup', CommonSelectors.isEscapeKey, function(){
         ctx.store.delete([line.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
       this.on('keyup', CommonSelectors.isEnterKey, function(){
-        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [line.id] });
+        ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
       });
       ctx.events.actionable({
         combineFeatures: false,
@@ -87,7 +92,7 @@ module.exports = function(ctx) {
       line.removeCoordinate(String(currentVertexPosition));
       if (line.isValid()) {
         ctx.map.fire(Constants.events.CREATE, {
-          features: [line.toGeoJSON(), point.toGeoJSON()]
+          features: [point.toGeoJSON(), line.toGeoJSON()]
         });
       } else {
         ctx.store.delete([line.id], { silent: true });
