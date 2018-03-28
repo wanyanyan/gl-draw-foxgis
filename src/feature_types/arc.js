@@ -28,12 +28,16 @@ Arc.prototype.getArcVertex = function(ctx,p1,p2,p3) {
 		var x = c.x+(p1.x-c.x)*Math.cos(i*PI/50)-(p1.y-c.y)*Math.sin(i*PI/50);
 		var y = c.y+(p1.x-c.x)*Math.sin(i*PI/50)+(p1.y-c.y)*Math.cos(i*PI/50);
 
-		var lnglat = ctx.map.unproject([x,y]);
-		arcVertex.push([lnglat.lng,lnglat.lat]);
-		var angle = Math.atan((y-c.y)/(x-c.x))-Math.atan((p3.y-c.y)/(p3.x-c.x));
-		if(Math.abs(angle)<PI/50&&(x-c.x)/(p3.x-c.x)>0){
-			break;
+		try {
+			var lnglat = ctx.map.unproject([x,y]);
+			arcVertex.push([lnglat.lng,lnglat.lat]);
+			var angle = Math.atan((y-c.y)/(x-c.x))-Math.atan((p3.y-c.y)/(p3.x-c.x));
+			if(Math.abs(angle)<PI/50&&(x-c.x)/(p3.x-c.x)>0){
+				break;
+			}
+		} catch (e) {
 		}
+		
 	}
 	return arcVertex;
 };

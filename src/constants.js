@@ -102,8 +102,8 @@ module.exports = {
     BEZIER_ARROW:'bezier_arrow',
     DOVETAIL_ARROW:'dovetail_arrow',
     BEZIER_DOVETAIL_ARROW: 'bezier_dovetail_arrow',
-    LABEL_POINT: 'label_point',
-    LABEL_LINE: 'label_line'
+    LABEL_WITH_LINE: 'label_with_line',
+    LABEL_ON_LINE: 'label_on_line'
   },
   activeStates: {
     ACTIVE: 'true',

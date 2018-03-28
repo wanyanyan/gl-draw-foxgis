@@ -3,6 +3,7 @@ const mouseEventPoint = require('../lib/mouse_event_point');
 const featuresAt = require('../lib/features_at');
 const createSupplementaryPoints = require('../lib/create_supplementary_points');
 const createControlFeature = require('../lib/create_control_feature');
+const constrainFeatureMovement = require('../lib/constrain_feature_movement');
 const StringSet = require('../lib/string_set');
 const doubleClickZoom = require('../lib/double_click_zoom');
 const moveFeatures = require('../lib/move_features');
@@ -22,6 +23,7 @@ module.exports = function(ctx, options) {
   var canDragMove = false;
   var transformTarget = null;
   var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
+  var isLabelPoint = false;   // 是否为带线标注的注记
 
   var location = '';
 
@@ -91,6 +93,37 @@ module.exports = function(ctx, options) {
     transformTarget = null;
   };
 
+  var dragVertex = function(e, delta) {
+    var selectedCoordPaths = ['1'];
+    var target = ctx.store.getSelected();
+    if(target.length>1) {
+      return
+    }
+    var feature = ctx.store.get(target[0].properties.associatedFeatureId);
+    const selectedCoords = selectedCoordPaths.map(function(coord_path){return feature.getCoordinate(coord_path)});
+    const selectedCoordPoints = selectedCoords.map(function(coords){
+      return {
+        type: Constants.geojsonTypes.FEATURE,
+        properties: {},
+        geometry: {
+          type: Constants.geojsonTypes.POINT,
+          coordinates: coords
+        }
+      }
+    });
+
+    var constrainedDelta = constrainFeatureMovement(selectedCoordPoints, delta);
+    for (var i = 0; i < selectedCoords.length; i++) {
+      const coord = selectedCoords[i];
+      feature.updateCoordinate(selectedCoordPaths[i],
+      coord[0] + constrainedDelta.lng,
+      coord[1] + constrainedDelta.lat);
+    }
+    ctx.map.fire('draw.labelpoint.drag', {
+      feature: target[0]
+    });
+  };
+
   return {
     stop: function() {
       var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
@@ -144,7 +177,7 @@ module.exports = function(ctx, options) {
       });
 
       // 顶点上的点击事件
-      this.on('click', CommonSelectors.isOfMetaType(Constants.meta.VERTEX), function(e) {
+      /*this.on('click', CommonSelectors.isOfMetaType(Constants.meta.VERTEX), function(e) {
         // Enter direct select mode
         ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
           featureId: e.featureTarget.properties.parent,
@@ -152,13 +185,14 @@ module.exports = function(ctx, options) {
           startPos: e.lngLat
         });
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.MOVE });
-      });
+      });*/
 
       // mousedown事件
       this.on('mousedown', CommonSelectors.true, function(e) {
         initialDragPanState = ctx.map.dragPan.isEnabled();
         var isActiveFeature = CommonSelectors.isActiveFeature(e);
         var isControlPoint = CommonSelectors.isOfMetaType(Constants.meta.CONTROL)(e);
+        isLabelPoint = CommonSelectors.isLabelPoint(e);   // 是否为带线标注的注记
         if(!isActiveFeature&&!isControlPoint){
           return;
         }
@@ -200,12 +234,12 @@ module.exports = function(ctx, options) {
         doubleClickZoom.disable(ctx);
         stopExtendedInteractions();
         // 没有按shift，点击一个选中的要素，进入direct_select
-        if (!isShiftClick && isFeatureSelected && ctx.store.get(featureId).type !== Constants.geojsonTypes.POINT) {
+        /*if (!isShiftClick && isFeatureSelected && ctx.store.get(featureId).type !== Constants.geojsonTypes.POINT) {
           // Enter direct select mode
           return ctx.events.changeMode(Constants.modes.DIRECT_SELECT, {
             featureId: featureId
           });
-        }
+        }*/
 
         // 按住shift，点击一个选中的要素，取消选中
         if (isFeatureSelected && isShiftClick) {
@@ -337,6 +371,13 @@ module.exports = function(ctx, options) {
           }
           transformFeatures(ctx,[transformTarget], matrix);
         }else{
+          if (isLabelPoint) {
+            var del = {
+              lng: e.lngLat.lng - dragMoveLocation.lng,
+              lat: e.lngLat.lat - dragMoveLocation.lat
+            };
+            dragVertex(e, del);
+          }
           matrix[0][2] = delta.x;
           matrix[1][2] = delta.y;
           transformFeatures(ctx,ctx.store.getSelected(), matrix);

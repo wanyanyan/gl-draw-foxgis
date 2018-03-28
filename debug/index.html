@@ -76,10 +76,11 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
 
   var map = new mapboxgl.Map({
     container: 'map',
-    zoom: args.zoom || 3,
+    zoom: args.zoom || 8,
     center: args.latlng || [116, 30],
-    style: 'mapbox://styles/mapbox/streets-v8'
-    /*style: 'http://localhost:8090/api/v1/styles/gl-draw'*/
+    projection: 'EPSG:4490',
+    /*style: 'mapbox://styles/mapbox/streets-v8'*/
+    style: 'http://localhost:3000/api/v1/styles/gl-draw'
   });
 
   map.addControl(new mapboxgl.NavigationControl(), 'top-left');

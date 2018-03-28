@@ -35,11 +35,6 @@ module.exports = function(ctx) {
           if(arcVertex){
             arc.setCoordinates(arcVertex);
           }
-        }else if(currentVertexPosition === 3){//结束
-          ctx.map.fire(Constants.events.CREATE, {
-            features: [arc.toGeoJSON()]
-          });
-          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
         }else if(currentVertexPosition === 1){
           arc.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         }
@@ -53,7 +48,10 @@ module.exports = function(ctx) {
         }
         ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
         if(currentVertexPosition===2){
-          currentVertexPosition++;
+          ctx.map.fire(Constants.events.CREATE, {
+            features: [arc.toGeoJSON()]
+          });
+          ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [arc.id] });
         }else{
           arc.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
           points.push(ctx.map.project(e.lngLat));

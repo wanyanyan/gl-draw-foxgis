@@ -244,9 +244,26 @@ module.exports = [
     }
   },
   {
+    'id': 'gl-draw-label-line-inactive',
+    'type': 'line',
+    'filter': ['all',
+      ['==', 'active', 'false'],
+      ['==', 'type', 'label_with_line'],
+      ['!=', 'mode', 'static']
+    ],
+    'layout': {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    'paint': {
+      'line-color': '#3bb2d0',
+      'line-width': 2
+    }
+  },
+  {
     'id': 'gl-draw-label-point',
     'type': 'symbol',
-    'filter': ['all', ['==', 'type', 'label_point'],['==', 'meta', 'feature']],
+    'filter': ['all', ['==', 'type', 'label_with_line'],['==', 'meta', 'feature'],['==', '$type', 'Point']],
     "layout": {
       "symbol-placement": "point",
       "text-field": "带线标注",
@@ -260,7 +277,7 @@ module.exports = [
       "text-ignore-placement": true
     },
     "paint": {
-      "text-color": "#000000"
+      "text-color": "#ffff00"
     }
   },
   {

@@ -47,7 +47,7 @@ module.exports = function(ctx, opts) {
   };
 
   var startDragging = function(e) {
-    initialDragPanState = this.map.dragPan.isEnabled();
+    initialDragPanState = ctx.map.dragPan.isEnabled();
     ctx.map.dragPan.disable();
     canDragMove = true;
     dragMoveLocation = e.lngLat;

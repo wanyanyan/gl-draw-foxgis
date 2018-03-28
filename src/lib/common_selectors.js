@@ -46,6 +46,12 @@ module.exports = {
     if (!e.featureTarget.properties) return false;
     return e.featureTarget.properties.type !== Constants.featureTypes.POINT&&e.featureTarget.properties.type !== Constants.featureTypes.LINE&&e.featureTarget.properties.type !== Constants.featureTypes.POLYGON;
   },
+  // 判断是否为带线标注的注记
+  isLabelPoint: function(e) {
+    if (!e.featureTarget) return false;
+    if (!e.featureTarget.properties) return false;
+    return e.featureTarget.properties.type === Constants.featureTypes.LABEL_WITH_LINE&&e.featureTarget.geometry.type === Constants.geojsonTypes.POINT;
+  },
   //判断是否为顶点
   isVertex: function(e) {
     var featureTarget = e.featureTarget;

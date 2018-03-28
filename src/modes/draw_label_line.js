@@ -9,7 +9,7 @@ module.exports = function(ctx) {
   const bezier = new BezierSpline(ctx, {
     type: Constants.geojsonTypes.FEATURE,
     properties: {
-      type:Constants.featureTypes.LABEL_LINE
+      type:Constants.featureTypes.LABEL_ON_LINE
     },
     geometry: {
       type: Constants.geojsonTypes.LINE_STRING,
@@ -53,12 +53,12 @@ module.exports = function(ctx) {
           var layer1 = {
             'id': bezier.id + '_hot',
             'type': 'symbol',
-            'filter': ["all",['==', 'type', 'label_line'], ["==","id",bezier.id]],
+            'filter': ["all",['==', 'type', 'label_on_line'], ["==","id",bezier.id]],
             'source':"mapbox-gl-draw-hot",
             "layout": {
               "symbol-placement": "line",
-              "text-letter-spacing": 1,
-              "symbol-spacing": 150,
+              "text-letter-spacing": 0,
+              "symbol-spacing": 80,
               "text-field": "沿线标注",
               "text-font": [
                 "SimHei Regular"
@@ -74,12 +74,12 @@ module.exports = function(ctx) {
           var layer2 = {
             'id': bezier.id + '_cold',
             'type': 'symbol',
-            'filter': ["all",['==', 'type', 'label_line'], ["==","id",bezier.id]],
+            'filter': ["all",['==', 'type', 'label_on_line'], ["==","id",bezier.id]],
             'source':"mapbox-gl-draw-cold",
             "layout": {
               "symbol-placement": "line",
-              "text-letter-spacing": 1,
-              "symbol-spacing": 150,
+              "text-letter-spacing": 0,
+              "symbol-spacing": 80,
               "text-field": "沿线标注",
               "text-font": [
                 "SimHei Regular"

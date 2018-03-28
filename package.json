@@ -1,6 +1,6 @@
 {
   "name": "gl-draw-foxgis",
-  "version": "0.16.0",
+  "version": "0.16.2",
   "description": "A drawing component for Mapbox GL JS",
   "homepage": "https://github.com/wanyanyan/gl-draw-foxgis",
   "author": "mapbox wanyanyan",
@@ -17,7 +17,6 @@
     "tape": "tape -r ./test/mock-browser.js -r babel-register test/*.test.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter html npm run tape && opener coverage/index.html",
     "build": "cross-env NODE_ENV=production browserify index.js --standalone MapboxDraw > dist/gl-draw-foxgis.js",
-    "prepublish": "cross-env NODE_ENV=production browserify index.js --standalone MapboxDraw | uglifyjs -c -m > dist/gl-draw-foxgis.js",
     "start": "node server.js"
   },
   "repository": {

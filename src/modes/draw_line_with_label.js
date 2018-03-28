@@ -7,26 +7,30 @@ const Constants = require('../constants');
 const createVertex = require('../lib/create_vertex');
 
 module.exports = function(ctx) {
-  const line = new LineString(ctx, {
-    type: Constants.geojsonTypes.FEATURE,
-    properties: {
-      type:Constants.featureTypes.LINE
-    },
-    geometry: {
-      type: Constants.geojsonTypes.LINE_STRING,
-      coordinates: []
-    }
-  });
   const point = new Point(ctx, {
     type: Constants.geojsonTypes.FEATURE,
     properties: {
-      type:Constants.featureTypes.LABEL_POINT
+      type: Constants.featureTypes.LABEL_WITH_LINE,
+      mode: Constants.modes.DRAW_LINE_WITH_LABEL
     },
     geometry: {
       type: Constants.geojsonTypes.POINT,
       coordinates: []
     }
   });
+  const line = new LineString(ctx, {
+    type: Constants.geojsonTypes.FEATURE,
+    properties: {
+      type:Constants.featureTypes.LABEL_WITH_LINE,
+      mode: Constants.modes.DRAW_LINE_WITH_LABEL
+    },
+    geometry: {
+      type: Constants.geojsonTypes.LINE_STRING,
+      coordinates: []
+    }
+  });
+  point.properties.associatedFeatureId = line.id;
+  line.properties.associatedFeatureId = point.id;
   var currentVertexPosition = 0;
 
   if (ctx._test) ctx._test.line = line;
@@ -45,11 +49,16 @@ module.exports = function(ctx) {
         line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         if(currentVertexPosition === 1) {
           point.updateCoordinate('', e.lngLat.lng, e.lngLat.lat);
+          ctx.map.fire('draw.labelpoint.drag', {
+            feature: point
+          });
         }else if(currentVertexPosition === 2){//结束
           ctx.map.fire(Constants.events.CREATE, {
             features: [point.toGeoJSON(), line.toGeoJSON()]
           });
           ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
+          line.properties.mode = Constants.modes.SIMPLE_SELECT;
+          point.properties.mode = Constants.modes.SIMPLE_SELECT;
         }
         if (CommonSelectors.isVertex(e)) {
           ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
@@ -67,7 +76,7 @@ module.exports = function(ctx) {
         return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
       });
       this.on('keyup', CommonSelectors.isEscapeKey, function(){
-        ctx.store.delete([line.id], { silent: true });
+        ctx.store.delete([line.id, point.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
       });
       this.on('keyup', CommonSelectors.isEnterKey, function(){
@@ -95,8 +104,7 @@ module.exports = function(ctx) {
           features: [point.toGeoJSON(), line.toGeoJSON()]
         });
       } else {
-        ctx.store.delete([line.id], { silent: true });
-        ctx.store.delete([point.id], { silent: true });
+        ctx.store.delete([line.id, point.id], { silent: true });
         ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, {}, { silent: true });
       }
     },
