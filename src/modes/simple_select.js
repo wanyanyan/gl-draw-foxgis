@@ -24,6 +24,8 @@ module.exports = function(ctx, options) {
   var transformTarget = null;
   var initialDragPanState = ctx.map ? ctx.map.dragPan.isEnabled() : true;
   var isLabelPoint = false;   // 是否为带线标注的注记
+  var labelPointText = '带线标注';   // 带线注记的注记文字内容
+  var labelPointTextSize = 20;   // 带线注记的注记文字大小
 
   var location = '';
 
@@ -93,35 +95,38 @@ module.exports = function(ctx, options) {
     transformTarget = null;
   };
 
+  var getLineEnd = function(pointFeature, lineFeature) {
+    var pointXY = ctx.map.project(pointFeature.coordinates);
+    var text = labelPointText;
+    var lineLnglat = lineFeature.coordinates;
+    var ratio = getSlope(lineLnglat[0], pointFeature.coordinates);
+    var newPoint = {};
+    if(ratio>-1&&ratio<1&&pointFeature.coordinates[0] > lineLnglat[0][0]) {  // 右
+      newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+      newPoint.y = pointXY.y;
+    } else if((ratio<-1||ratio>1)&&pointFeature.coordinates[1] < lineLnglat[0][1]) {// 下
+      newPoint.x = pointXY.x;
+      newPoint.y = pointXY.y - labelPointTextSize / 2 - 5;
+    } else if(ratio>-1&&ratio<1&&pointFeature.coordinates[0] < lineLnglat[0][0]) {// 左
+      newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+      newPoint.y = pointXY.y;
+    } else if((ratio<-1||ratio>1)&&pointFeature.coordinates[1] > lineLnglat[0][1]) {// 上
+      newPoint.x = pointXY.x;
+      newPoint.y = pointXY.y + labelPointTextSize / 2 + 5;
+    }
+    return ctx.map.unproject(newPoint);
+  }
+  var getSlope = function(p1, p2) {
+    return (p2[1] - p1[1]) / (p2[0] - p1[0]);
+  }
   var dragVertex = function(e, delta) {
-    var selectedCoordPaths = ['1'];
     var target = ctx.store.getSelected();
     if(target.length>1) {
       return
     }
     var feature = ctx.store.get(target[0].properties.associatedFeatureId);
-    const selectedCoords = selectedCoordPaths.map(function(coord_path){return feature.getCoordinate(coord_path)});
-    const selectedCoordPoints = selectedCoords.map(function(coords){
-      return {
-        type: Constants.geojsonTypes.FEATURE,
-        properties: {},
-        geometry: {
-          type: Constants.geojsonTypes.POINT,
-          coordinates: coords
-        }
-      }
-    });
-
-    var constrainedDelta = constrainFeatureMovement(selectedCoordPoints, delta);
-    for (var i = 0; i < selectedCoords.length; i++) {
-      const coord = selectedCoords[i];
-      feature.updateCoordinate(selectedCoordPaths[i],
-      coord[0] + constrainedDelta.lng,
-      coord[1] + constrainedDelta.lat);
-    }
-    ctx.map.fire('draw.labelpoint.drag', {
-      feature: target[0]
-    });
+    var lineEnd = getLineEnd(target[0], feature);
+    feature.updateCoordinate('1', lineEnd.lng, lineEnd.lat);
   };
 
   return {
@@ -193,6 +198,13 @@ module.exports = function(ctx, options) {
         var isActiveFeature = CommonSelectors.isActiveFeature(e);
         var isControlPoint = CommonSelectors.isOfMetaType(Constants.meta.CONTROL)(e);
         isLabelPoint = CommonSelectors.isLabelPoint(e);   // 是否为带线标注的注记
+        if (isLabelPoint) {
+          var renderFeature = ctx.map.queryRenderedFeatures(e.point);
+          if (renderFeature.length) {
+            labelPointText = renderFeature[0].layer.layout['text-field'];
+            labelPointTextSize = renderFeature[0].layer.layout['text-size'];
+          }
+        }
         if(!isActiveFeature&&!isControlPoint){
           return;
         }

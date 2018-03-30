@@ -266,13 +266,11 @@ module.exports = [
     'filter': ['all', ['==', 'type', 'label_with_line'],['==', 'meta', 'feature'],['==', '$type', 'Point']],
     "layout": {
       "symbol-placement": "point",
-      "text-field": "带线标注",
+      "text-field": "带线注记",
       "text-font": [
         "SimHei Regular"
       ],
       "text-size": 14,
-      "text-anchor": "left",
-      "text-offset": [0.5,-0.5],
       "text-allow-overlap": true,
       "text-ignore-placement": true
     },

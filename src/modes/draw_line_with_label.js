@@ -11,7 +11,8 @@ module.exports = function(ctx) {
     type: Constants.geojsonTypes.FEATURE,
     properties: {
       type: Constants.featureTypes.LABEL_WITH_LINE,
-      mode: Constants.modes.DRAW_LINE_WITH_LABEL
+      mode: Constants.modes.DRAW_LINE_WITH_LABEL,
+      name: '带线标注'
     },
     geometry: {
       type: Constants.geojsonTypes.POINT,
@@ -32,12 +33,38 @@ module.exports = function(ctx) {
   point.properties.associatedFeatureId = line.id;
   line.properties.associatedFeatureId = point.id;
   var currentVertexPosition = 0;
+  var labelPointTextSize = 14;
 
   if (ctx._test) ctx._test.line = line;
   if (ctx._test) ctx._test.point = point;
 
   ctx.store.add(line);
   ctx.store.add(point);
+
+  var getLineEnd = function(pointFeature, lineFeature) {
+    var pointXY = ctx.map.project(pointFeature.coordinates);
+    var text = pointFeature.properties.name;
+    var lineLnglat = lineFeature.coordinates;
+    var ratio = getSlope(lineLnglat[0], pointFeature.coordinates);
+    var newPoint = {};
+    if(ratio>-1&&ratio<1&&pointFeature.coordinates[0] > lineLnglat[0][0]) {  // 右
+      newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+      newPoint.y = pointXY.y;
+    } else if((ratio<-1||ratio>1)&&pointFeature.coordinates[1] < lineLnglat[0][1]) {// 下
+      newPoint.x = pointXY.x;
+      newPoint.y = pointXY.y - labelPointTextSize / 2 - 5;
+    } else if(ratio>-1&&ratio<1&&pointFeature.coordinates[0] < lineLnglat[0][0]) {// 左
+      newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+      newPoint.y = pointXY.y;
+    } else if((ratio<-1||ratio>1)&&pointFeature.coordinates[1] > lineLnglat[0][1]) {// 上
+      newPoint.x = pointXY.x;
+      newPoint.y = pointXY.y + labelPointTextSize / 2 + 5;
+    }
+    return ctx.map.unproject(newPoint);
+  }
+  var getSlope = function(p1, p2) {
+    return (p2[1] - p1[1]) / (p2[0] - p1[0]);
+  }
 
   return {
     start: function() {
@@ -46,16 +73,15 @@ module.exports = function(ctx) {
       ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
       ctx.ui.setActiveButton(Constants.types.LINE);
       this.on('mousemove', CommonSelectors.true, function(e){
-        line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
         if(currentVertexPosition === 1) {
           point.updateCoordinate('', e.lngLat.lng, e.lngLat.lat);
-          ctx.map.fire('draw.labelpoint.drag', {
-            feature: point
-          });
+          var lineEnd = getLineEnd(point, line);
+          line.updateCoordinate(currentVertexPosition, lineEnd.lng, lineEnd.lat);
         }else if(currentVertexPosition === 2){//结束
           ctx.map.fire(Constants.events.CREATE, {
             features: [point.toGeoJSON(), line.toGeoJSON()]
           });
+          ctx.events.changeMode(Constants.modes.STATIC);
           ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
           line.properties.mode = Constants.modes.SIMPLE_SELECT;
           point.properties.mode = Constants.modes.SIMPLE_SELECT;
@@ -68,8 +94,14 @@ module.exports = function(ctx) {
         if(currentVertexPosition > 0 && isEventAtCoordinates(e, line.coordinates[currentVertexPosition - 1])) {
           return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
         }
-        ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
-        line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
+        if (currentVertexPosition === 0) {
+          ctx.ui.queueMapClasses({ mouse: Constants.cursors.ADD });
+          line.updateCoordinate(currentVertexPosition, e.lngLat.lng, e.lngLat.lat);
+        }
+        if (currentVertexPosition === 1) {
+          var lineEnd = getLineEnd(point, line);
+          line.updateCoordinate(currentVertexPosition, lineEnd.lng, lineEnd.lat);
+        }
         currentVertexPosition++;
       });
       this.on('click', CommonSelectors.isVertex, function(){
