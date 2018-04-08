@@ -8,7 +8,10 @@
   <link href='/dist/gl-draw-foxgis.css' rel='stylesheet' />
   <style>
     body { margin:0; padding:0; }
-    html, body, #map { height: 100%; }
+    html, body, #map { height: 100%;}
+    #map {
+      transform: scale(0.8);
+    }
     .start-draw {
       width: 100%;
       position: absolute;
@@ -78,7 +81,7 @@ location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
     container: 'map',
     zoom: args.zoom || 8,
     center: args.latlng || [116, 30],
-    projection: 'EPSG:4490',
+    projection: 'EPSG:3857',
     /*style: 'mapbox://styles/mapbox/streets-v8'*/
     style: 'http://localhost:3000/api/v1/styles/gl-draw'
   });

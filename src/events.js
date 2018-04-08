@@ -43,6 +43,7 @@ module.exports = function(ctx) {
   };
 
   events.mousemove = function(event) {
+    recalculateCoord(event);
     const button = event.originalEvent.buttons !== undefined ? event.originalEvent.buttons : event.originalEvent.which;
     if (button === 1) {
       return events.drag(event);
@@ -53,6 +54,7 @@ module.exports = function(ctx) {
   };
 
   events.mousedown = function(event) {
+    recalculateCoord(event);
     mouseDownInfo = {
       time: new Date().getTime(),
       point: event.point
@@ -63,6 +65,7 @@ module.exports = function(ctx) {
   };
 
   events.mouseup = function(event) {
+    recalculateCoord(event);
     const target = getFeaturesAndSetCursor(event, ctx);
     event.featureTarget = target;
 
@@ -124,6 +127,12 @@ module.exports = function(ctx) {
     }
   };
 
+  function recalculateCoord(event) {
+    let t = ctx.transform || 1;
+    event.point.x /= t;
+    event.point.y /= t;
+    event.lngLat = ctx.map.unproject(event.point);
+  }
   function changeMode(modename, nextModeOptions, eventOptions) {
     if(eventOptions===undefined){eventOptions={};}
     currentMode.stop();

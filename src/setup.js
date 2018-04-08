@@ -11,6 +11,7 @@ module.exports = function(ctx) {
   ctx.container = null;
   ctx.store = null;
   ctx.ui = ui(ctx);
+  ctx.transform = 1;
 
   var controlContainer = null;
   var setup = {

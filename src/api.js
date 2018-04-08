@@ -192,5 +192,11 @@ module.exports = function(ctx,api) {
     ctx.events.uncombineFeatures({ silent: true });
     return api;
   };
+  api.getTransform = function() {
+    return ctx.transform;
+  };
+  api.setTransform = function(value) {
+    ctx.transform = value;
+  }
   return api;
 };
