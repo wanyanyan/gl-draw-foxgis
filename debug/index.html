@@ -1,221 +1,263 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-  <meta charset=utf-8 />
-  <title>Mapbox GL Draw | Mapbox</title>
-  <link href='/mapbox-gl.css' rel='stylesheet' />
-  <link href='/dist/gl-draw-foxgis.css' rel='stylesheet' />
-  <style>
-    body { margin:0; padding:0; }
-    html, body, #map { height: 100%;}
-    #map {
-      transform: scale(0.8);
-    }
-    .start-draw {
-      width: 100%;
-      position: absolute;
-      /* margin: 10px; */
-      bottom: 0;
-      background: #efefef;
-    }
-    .start-draw div {
-      float: left;
-      border: 1px solid #ccc;
-      background: #ddd;
-      padding: 5px;
-      margin: 5px;
-      cursor: pointer;
-    }
-    .toggle {
-      position: absolute;
-      bottom: 20px;
-      right: 10px;
-    }
-  </style>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <meta charset=utf-8 />
+    <title>Mapbox GL Draw | Mapbox</title>
+    <link href='/mapbox-gl.css' rel='stylesheet' />
+    <link href='/dist/gl-draw-foxgis.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        html,
+        body,
+        #map {
+            height: 100%;
+        }
+        
+        #map {
+            /*  transform: scale(0.8); */
+        }
+        
+        .start-draw {
+            width: 100%;
+            position: absolute;
+            /* margin: 10px; */
+            bottom: 0;
+            background: #efefef;
+        }
+        
+        .start-draw div {
+            float: left;
+            border: 1px solid #ccc;
+            background: #ddd;
+            padding: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        .toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+        }
+    </style>
 </head>
+
 <body>
-<div id='map'></div>
-<div class='start-draw'>
-  <div id='start-point'>点</div>
-  <div id='start-line'>线</div>
-  <div id='start-polygon'>多边形</div>
-  <div id='start-triangle'>三角形</div>
-  <div id='start-rectangle'>矩形</div>
-  <div id='start-circle'>圆</div>
-  <div id='start-arrow'>箭头</div>
-  <div id='start-arc'>圆弧</div>
-  <div id='start-bezier'>曲线</div>
-  <div id='start-bezier_arrow'>曲线箭头</div>
-  <div id='start-dovetail_arrow'>燕尾箭头</div>
-  <div id='start-bezier_dovetail_arrow'>曲线燕尾</div>
-  <div id='start-line-with-label'>带线标注</div>
-  <div id='start-label-line'>沿线标注</div>
-</div>
-<div class='toggle'>
-  <button id='addBtn'>add draw</button>
-  <button id='removeBtn'>remove draw</button>
-  <button id='flipStyleBtn'>change style</button>
-</div>
-<script src='mapbox-gl-dev_4490.js'></script>
-<script src='/gl-draw-foxgis.js'></script>
-<script type='text/javascript'>
-// making run more like github.com/mapbox/mapbox-gl-js
-//eg http://127.0.0.1:9966/debug/?access_token=<the-token>#13/37.76/-122.42
-var args = location.search.replace(/^\?/,'').split('&').reduce(function(o, param){ var keyvalue=param.split('='); o[keyvalue[0]] = keyvalue[1]; return o; }, {});
-mapboxgl.accessToken = args.access_token || localStorage.accessToken;
-// could work this further but going off the above example
-location.hash.replace(/^#/,'').split('/').reduce(function(args, val, i, hash){
-  switch(i){
-  case 0: args.zoom = val; break;
-  case 1: args.latitude = val; break;
-  case 2:
-    args.longitude = val;
-    if(args.latitude) args.latlng = [val, args.latitude];
-  break;
-  };
-  return args;
-}, args);
+    <div id='map'></div>
+    <div class='start-draw'>
+        <div id='start-point'>点</div>
+        <div id='start-line'>线</div>
+        <div id='start-polygon'>多边形</div>
+        <div id='start-triangle'>三角形</div>
+        <div id='start-rectangle'>矩形</div>
+        <div id='start-circle'>圆</div>
+        <div id='start-ellipse'>椭圆</div>
+        <div id='start-arrow'>箭头</div>
+        <div id='start-arc'>圆弧</div>
+        <div id='start-bezier'>曲线</div>
+        <div id='start-bezier_arrow'>曲线箭头</div>
+        <div id='start-dovetail_arrow'>燕尾箭头</div>
+        <div id='start-bezier_dovetail_arrow'>曲线燕尾</div>
+        <div id='start-line-with-label'>带线标注</div>
+        <div id='start-label-line'>沿线标注</div>
+    </div>
+    <div class='toggle'>
+        <button id='addBtn'>add draw</button>
+        <button id='removeBtn'>remove draw</button>
+        <button id='flipStyleBtn'>change style</button>
+    </div>
+    <script src='mapbox-gl-dev_4490.js'></script>
+    <script src='/gl-draw-foxgis.js'></script>
+    <script type='text/javascript'>
+        // making run more like github.com/mapbox/mapbox-gl-js
+        //eg http://127.0.0.1:9966/debug/?access_token=<the-token>#13/37.76/-122.42
+        var args = location.search.replace(/^\?/, '').split('&').reduce(function(o, param) {
+            var keyvalue = param.split('=');
+            o[keyvalue[0]] = keyvalue[1];
+            return o;
+        }, {});
+        mapboxgl.accessToken = args.access_token || localStorage.accessToken;
+        // could work this further but going off the above example
+        location.hash.replace(/^#/, '').split('/').reduce(function(args, val, i, hash) {
+            switch (i) {
+                case 0:
+                    args.zoom = val;
+                    break;
+                case 1:
+                    args.latitude = val;
+                    break;
+                case 2:
+                    args.longitude = val;
+                    if (args.latitude) args.latlng = [val, args.latitude];
+                    break;
+            };
+            return args;
+        }, args);
 
-  var map = new mapboxgl.Map({
-    container: 'map',
-    zoom: args.zoom || 8,
-    center: args.latlng || [116, 30],
-    projection: 'EPSG:3857',
-    /*style: 'mapbox://styles/mapbox/streets-v8'*/
-    style: 'http://localhost:3000/api/v1/styles/gl-draw'
-  });
+        var map = new mapboxgl.Map({
+            container: 'map',
+            zoom: args.zoom || 8,
+            center: args.latlng || [116, 30],
+            projection: 'EPSG:3857',
+            /*style: 'mapbox://styles/mapbox/streets-v8'*/
+            style: 'http://localhost:3000/api/v1/styles/gl-draw'
+        });
 
-  map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+        map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
-  var Draw = window.Draw = new MapboxDraw();
-  var drawIsActive = true;
-  map.addControl(Draw, 'bottom-right');
+        var Draw = window.Draw = new MapboxDraw();
+        var drawIsActive = true;
+        map.addControl(Draw, 'bottom-right');
 
-  map.on('load', function() {
+        map.on('load', function() {
 
-    // toggle
-    var addButton = document.getElementById('addBtn');
-    var removeButton = document.getElementById('removeBtn');
-    var flipStyleButton = document.getElementById('flipStyleBtn');
-    var currentStyle = 'geoway_admin';
-    addButton.onclick = function() {
-      if (drawIsActive) return;
-      drawIsActive = true;
-      map.addControl(Draw, 'bottom-right');
-    }
-    removeButton.onclick = function() {
-      if (!drawIsActive) return;
-      drawIsActive = false;
-      map.removeControl(Draw);
-    }
+            // toggle
+            var addButton = document.getElementById('addBtn');
+            var removeButton = document.getElementById('removeBtn');
+            var flipStyleButton = document.getElementById('flipStyleBtn');
+            var currentStyle = 'geoway_admin';
+            addButton.onclick = function() {
+                if (drawIsActive) return;
+                drawIsActive = true;
+                map.addControl(Draw, 'bottom-right');
+            }
+            removeButton.onclick = function() {
+                if (!drawIsActive) return;
+                drawIsActive = false;
+                map.removeControl(Draw);
+            }
 
-    flipStyleButton.onclick = function() {
-      var style = currentStyle === 'geoway_admin' ? 'dark-v9' : 'streets-v9';
-      map.setStyle('mapbox://styles/mapbox/' + style);
-      currentStyle = style;
-    }
-    var startPoint = document.getElementById('start-point');
-    var startLine = document.getElementById('start-line');
-    var startPolygon = document.getElementById('start-polygon');
-    var startTriangle = document.getElementById('start-triangle');
-    var startRectangle = document.getElementById('start-rectangle');
-    var startCircle = document.getElementById('start-circle');
-    var startArrow = document.getElementById('start-arrow');
-    var startArc = document.getElementById('start-arc');
-    var startBezier = document.getElementById('start-bezier');
-    var startBezierArrow = document.getElementById('start-bezier_arrow');
-    var startLineWithLabel = document.getElementById('start-line-with-label');
-    var startLabelLine = document.getElementById('start-label-line');
-    var startDoveTailArrow = document.getElementById('start-dovetail_arrow');
-    var startBezierDoveTailArrow = document.getElementById('start-bezier_dovetail_arrow');
+            flipStyleButton.onclick = function() {
+                var style = currentStyle === 'geoway_admin' ? 'dark-v9' : 'streets-v9';
+                map.setStyle('mapbox://styles/mapbox/' + style);
+                currentStyle = style;
+            }
+            var startPoint = document.getElementById('start-point');
+            var startLine = document.getElementById('start-line');
+            var startPolygon = document.getElementById('start-polygon');
+            var startTriangle = document.getElementById('start-triangle');
+            var startRectangle = document.getElementById('start-rectangle');
+            var startCircle = document.getElementById('start-circle');
+            var startEllipse = document.getElementById('start-ellipse');
+            var startArrow = document.getElementById('start-arrow');
+            var startArc = document.getElementById('start-arc');
+            var startBezier = document.getElementById('start-bezier');
+            var startBezierArrow = document.getElementById('start-bezier_arrow');
+            var startLineWithLabel = document.getElementById('start-line-with-label');
+            var startLabelLine = document.getElementById('start-label-line');
+            var startDoveTailArrow = document.getElementById('start-dovetail_arrow');
+            var startBezierDoveTailArrow = document.getElementById('start-bezier_dovetail_arrow');
 
 
-    startPoint.onclick = function() {
-      Draw.changeMode('draw_point');
-    };
+            startPoint.onclick = function() {
+                Draw.changeMode('draw_point');
+            };
 
-    startLine.onclick = function() {
-      Draw.changeMode('draw_line_string');
-    };
+            startLine.onclick = function() {
+                Draw.changeMode('draw_line_string');
+            };
 
-    startPolygon.onclick = function() {
-      Draw.changeMode('draw_polygon');
-    };
+            startPolygon.onclick = function() {
+                Draw.changeMode('draw_polygon');
+            };
 
-    startTriangle.onclick = function() {
-      Draw.changeMode('draw_triangle');
-    };
+            startTriangle.onclick = function() {
+                Draw.changeMode('draw_triangle');
+            };
 
-    startRectangle.onclick = function() {
-      Draw.changeMode('draw_rectangle');
-    };
+            startRectangle.onclick = function() {
+                Draw.changeMode('draw_rectangle');
+            };
 
-    startCircle.onclick = function() {
-      Draw.changeMode('draw_circle');
-    };
+            startCircle.onclick = function() {
+                Draw.changeMode('draw_circle');
+            };
 
-    startArrow.onclick = function() {
-      Draw.changeMode('draw_arrow');
-    };
+            startEllipse.onclick = function() {
+                Draw.changeMode('draw_ellipse');
+            };
 
-    startArc.onclick = function() {
-      Draw.changeMode('draw_arc');
-    };
+            startArrow.onclick = function() {
+                Draw.changeMode('draw_arrow');
+            };
 
-    startBezier.onclick = function() {
-      Draw.changeMode('draw_bezier');
-    };
+            startArc.onclick = function() {
+                Draw.changeMode('draw_arc');
+            };
 
-    startBezierArrow.onclick = function() {
-      Draw.changeMode('draw_bezier_arrow');
-    };
+            startBezier.onclick = function() {
+                Draw.changeMode('draw_bezier');
+            };
 
-    startLineWithLabel.onclick = function() {
-      Draw.changeMode('draw_line_with_label');
-    }
+            startBezierArrow.onclick = function() {
+                Draw.changeMode('draw_bezier_arrow');
+            };
 
-    startLabelLine.onclick = function() {
-      Draw.changeMode('draw_label_line');
-    }
+            startLineWithLabel.onclick = function() {
+                Draw.changeMode('draw_line_with_label');
+            }
 
-    startDoveTailArrow.onclick = function() {
-      Draw.changeMode('draw_dovetail_arrow');
-    }
+            startLabelLine.onclick = function() {
+                Draw.changeMode('draw_label_line');
+            }
 
-    startBezierDoveTailArrow.onclick = function() {
-      Draw.changeMode('draw_bezier_dovetail_arrow');
-    }
-  });
+            startDoveTailArrow.onclick = function() {
+                Draw.changeMode('draw_dovetail_arrow');
+            }
 
-  var loadData = function(uri) {
-  var req = new XMLHttpRequest();
-  req.onerror = function() {
-    throw new Error('Network Error');
-  };
-  req.onload = () => {
-    var fc = JSON.parse(req.response);
-    fc.features.forEach(feature => {
-      if(feature.geometry.type.startsWith('Multi') === false) {
-        Draw.add(feature);
-      }
-    });
+            startBezierDoveTailArrow.onclick = function() {
+                Draw.changeMode('draw_bezier_dovetail_arrow');
+            }
+        });
 
-  };
-  req.open('GET', uri);
-  req.send();
-}
+        var loadData = function(uri) {
+            var req = new XMLHttpRequest();
+            req.onerror = function() {
+                throw new Error('Network Error');
+            };
+            req.onload = () => {
+                var fc = JSON.parse(req.response);
+                fc.features.forEach(feature => {
+                    if (feature.geometry.type.startsWith('Multi') === false) {
+                        Draw.add(feature);
+                    }
+                });
 
-// loadData('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_polys.geojson');
+            };
+            req.open('GET', uri);
+            req.send();
+        }
 
-console.log('use `loadData(url)` to load in FeatureCollections to Draw via url');
-console.log('5.51MB Polygons - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_polys.geojson');
+        // loadData('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_polys.geojson');
 
-console.log('4.99MB LineStirings - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_rivers_north_america.geojson');
+        console.log('use `loadData(url)` to load in FeatureCollections to Draw via url');
+        console.log('5.51MB Polygons - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_geography_regions_polys.geojson');
 
-console.log('4.03MB Points - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_admin_1_label_points.geojson');
+        console.log('4.99MB LineStirings - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_rivers_north_america.geojson');
 
-  (function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();stats.domElement.style.cssText='position:fixed;right:0;top:0;z-index:10000';document.body.appendChild(stats.domElement);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})();
-</script>
+        console.log('4.03MB Points - https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_admin_1_label_points.geojson');
+
+        (function() {
+            var script = document.createElement('script');
+            script.onload = function() {
+                var stats = new Stats();
+                stats.domElement.style.cssText = 'position:fixed;right:0;top:0;z-index:10000';
+                document.body.appendChild(stats.domElement);
+                requestAnimationFrame(function loop() {
+                    stats.update();
+                    requestAnimationFrame(loop)
+                });
+            };
+            script.src = '//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';
+            document.head.appendChild(script);
+        })();
+    </script>
 </body>
+
 </html>
