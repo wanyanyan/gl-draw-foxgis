@@ -1,6 +1,6 @@
 {
   "name": "gl-draw-foxgis",
-  "version": "0.16.3",
+  "version": "0.16.5",
   "description": "A drawing component for Mapbox GL JS",
   "homepage": "https://github.com/wanyanyan/gl-draw-foxgis",
   "author": "mapbox wanyanyan",
