@@ -107,7 +107,12 @@ module.exports = function(ctx) {
                 }
             });
             this.on('click', CommonSelectors.true, function(e) {
-                if (currentVertexPosition > 0 && isEventAtCoordinates(e, line.coordinates[currentVertexPosition - 1])) {
+                if (currentVertexPosition > 1) {
+                    ctx.events.changeMode(Constants.modes.SIMPLE_SELECT);
+                    ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
+                    return
+                }
+                if (currentVertexPosition > 0 && line.coordinates.length > 0 && isEventAtCoordinates(e, line.coordinates[currentVertexPosition - 1])) {
                     return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
                 }
                 if (currentVertexPosition === 0) {
