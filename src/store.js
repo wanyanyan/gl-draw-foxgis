@@ -4,22 +4,22 @@ var StringSet = require('./lib/string_set');
 var render = require('./render');
 
 var Store = module.exports = function(ctx) {
-  this._features = {};
-  this._controlFeatures = {};
-  this._featureIds = new StringSet();
-  this._controlFeatureIds = new StringSet();
-  this._selectedFeatureIds = new StringSet();
-  this._selectedCoordinates = [];
-  this._changedFeatureIds = new StringSet();
-  this._deletedFeaturesToEmit = [];
-  this._emitSelectionChange = false;
-  this.ctx = ctx;
-  this.sources = {
-    hot: [],
-    cold: []
-  };
-  this.render = throttle(render, 16, this);
-  this.isDirty = false;
+    this._features = {};
+    this._controlFeatures = {};
+    this._featureIds = new StringSet();
+    this._controlFeatureIds = new StringSet();
+    this._selectedFeatureIds = new StringSet();
+    this._selectedCoordinates = [];
+    this._changedFeatureIds = new StringSet();
+    this._deletedFeaturesToEmit = [];
+    this._emitSelectionChange = false;
+    this.ctx = ctx;
+    this.sources = {
+        hot: [],
+        cold: []
+    };
+    this.render = throttle(render, 16, this);
+    this.isDirty = false;
 };
 
 
@@ -28,18 +28,18 @@ var Store = module.exports = function(ctx) {
  * @return {Function} renderBatch
  */
 Store.prototype.createRenderBatch = function() {
-  var holdRender = this.render;
-  var numRenders = 0;
-  this.render = function() {
-    numRenders++;
-  };
+    var holdRender = this.render;
+    var numRenders = 0;
+    this.render = function() {
+        numRenders++;
+    };
 
-  return function(){
-    this.render = holdRender;
-    if (numRenders > 0) {
-      this.render();
-    }
-  };
+    return function() {
+        this.render = holdRender;
+        if (numRenders > 0) {
+            this.render();
+        }
+    };
 };
 
 /**
@@ -47,8 +47,8 @@ Store.prototype.createRenderBatch = function() {
  * @return {Store} this
  */
 Store.prototype.setDirty = function() {
-  this.isDirty = true;
-  return this;
+    this.isDirty = true;
+    return this;
 };
 
 /**
@@ -57,8 +57,8 @@ Store.prototype.setDirty = function() {
  * @return {Store} this
  */
 Store.prototype.featureChanged = function(featureId) {
-  this._changedFeatureIds.add(featureId);
-  return this;
+    this._changedFeatureIds.add(featureId);
+    return this;
 };
 
 /**
@@ -66,7 +66,7 @@ Store.prototype.featureChanged = function(featureId) {
  * @return {Store} this
  */
 Store.prototype.getChangedIds = function() {
-  return this._changedFeatureIds.values();
+    return this._changedFeatureIds.values();
 };
 
 /**
@@ -74,8 +74,8 @@ Store.prototype.getChangedIds = function() {
  * @return {Store} this
  */
 Store.prototype.clearChangedIds = function() {
-  this._changedFeatureIds.clear();
-  return this;
+    this._changedFeatureIds.clear();
+    return this;
 };
 
 /**
@@ -83,7 +83,7 @@ Store.prototype.clearChangedIds = function() {
  * @return {Store} this
  */
 Store.prototype.getAllIds = function() {
-  return this._featureIds.values();
+    return this._featureIds.values();
 };
 
 /**
@@ -93,10 +93,10 @@ Store.prototype.getAllIds = function() {
  * @return {Store} this
  */
 Store.prototype.add = function(feature) {
-  this.featureChanged(feature.id);
-  this._features[feature.id] = feature;
-  this._featureIds.add(feature.id);
-  return this;
+    this.featureChanged(feature.id);
+    this._features[feature.id] = feature;
+    this._featureIds.add(feature.id);
+    return this;
 };
 
 /**
@@ -106,10 +106,10 @@ Store.prototype.add = function(feature) {
  * @return {Store} this
  */
 Store.prototype.addControlFeature = function(feature) {
-  //this.featureChanged(feature.id);
-  this._controlFeatures[feature.properties.parentId] = feature;
-  this._controlFeatureIds.add(feature.properties.parentId);
-  return this;
+    //this.featureChanged(feature.id);
+    this._controlFeatures[feature.properties.parentId] = feature;
+    this._controlFeatureIds.add(feature.properties.parentId);
+    return this;
 };
 
 /**
@@ -123,21 +123,21 @@ Store.prototype.addControlFeature = function(feature) {
  * @return {Store} this
  */
 Store.prototype.delete = function(featureIds, options) {
-  if(options===undefined){options={};}
-  var _this = this;
-  toDenseArray(featureIds).forEach(function(id){
-    if (!_this._featureIds.has(id)) return;
-    _this._featureIds.delete(id);
-    _this._selectedFeatureIds.delete(id);
-    if (!options.silent) {
-      if (_this._deletedFeaturesToEmit.indexOf(_this._features[id]) === -1) {
-        _this._deletedFeaturesToEmit.push(_this._features[id]);
-      }
-    }
-    delete _this._features[id];
-    _this.isDirty = true;
-  });
-  return this;
+    if (options === undefined) { options = {}; }
+    var _this = this;
+    toDenseArray(featureIds).forEach(function(id) {
+        if (!_this._featureIds.has(id)) return;
+        _this._featureIds.delete(id);
+        _this._selectedFeatureIds.delete(id);
+        if (!options.silent) {
+            if (_this._deletedFeaturesToEmit.indexOf(_this._features[id]) === -1) {
+                _this._deletedFeaturesToEmit.push(_this._features[id]);
+            }
+        }
+        delete _this._features[id];
+        _this.isDirty = true;
+    });
+    return this;
 };
 
 /**
@@ -145,7 +145,7 @@ Store.prototype.delete = function(featureIds, options) {
  * @return {Object | undefined} feature
  */
 Store.prototype.get = function(id) {
-  return this._features[id];
+    return this._features[id];
 };
 
 /**
@@ -153,7 +153,7 @@ Store.prototype.get = function(id) {
  * @return {Object | undefined} 控制要素
  */
 Store.prototype.getControlFeatureById = function(id) {
-  return this._controlFeatures[id];
+    return this._controlFeatures[id];
 };
 
 /**
@@ -161,8 +161,8 @@ Store.prototype.getControlFeatureById = function(id) {
  * @return {Array<Object>}
  */
 Store.prototype.getAll = function() {
-  var _this = this;
-  return Object.keys(this._features).map(function(id){return _this._features[id]});
+    var _this = this;
+    return Object.keys(this._features).map(function(id) { return _this._features[id] });
 };
 
 /**
@@ -173,17 +173,17 @@ Store.prototype.getAll = function() {
  * @return {Store} this
  */
 Store.prototype.select = function(featureIds, options) {
-  if(options===undefined){options={};}
-  var _this = this;
-  toDenseArray(featureIds).forEach(function(id){
-    if (_this._selectedFeatureIds.has(id)) return;
-    _this._selectedFeatureIds.add(id);
-    _this._changedFeatureIds.add(id);
-    if (!options.silent) {
-      _this._emitSelectionChange = true;
-    }
-  });
-  return this;
+    if (options === undefined) { options = {}; }
+    var _this = this;
+    toDenseArray(featureIds).forEach(function(id) {
+        if (_this._selectedFeatureIds.has(id)) return;
+        _this._selectedFeatureIds.add(id);
+        _this._changedFeatureIds.add(id);
+        if (!options.silent) {
+            _this._emitSelectionChange = true;
+        }
+    });
+    return this;
 };
 
 /**
@@ -194,18 +194,18 @@ Store.prototype.select = function(featureIds, options) {
  * @return {Store} this
  */
 Store.prototype.deselect = function(featureIds, options) {
-  if(options===undefined){options={};}
-  var _this = this;
-  toDenseArray(featureIds).forEach(function(id){
-    if (!_this._selectedFeatureIds.has(id)) return;
-    _this._selectedFeatureIds.delete(id);
-    _this._changedFeatureIds.add(id);
-    if (!options.silent) {
-      _this._emitSelectionChange = true;
-    }
-  });
-  refreshSelectedCoordinates.call(this, options);
-  return this;
+    if (options === undefined) { options = {}; }
+    var _this = this;
+    toDenseArray(featureIds).forEach(function(id) {
+        if (!_this._selectedFeatureIds.has(id)) return;
+        _this._selectedFeatureIds.delete(id);
+        _this._changedFeatureIds.add(id);
+        if (!options.silent) {
+            _this._emitSelectionChange = true;
+        }
+    });
+    refreshSelectedCoordinates.call(this, options);
+    return this;
 };
 
 /**
@@ -215,9 +215,9 @@ Store.prototype.deselect = function(featureIds, options) {
  * @return {Store} this
  */
 Store.prototype.clearSelected = function(options) {
-  if(options===undefined){options={};}
-  this.deselect(this._selectedFeatureIds.values(), { silent: options.silent });
-  return this;
+    if (options === undefined) { options = {}; }
+    this.deselect(this._selectedFeatureIds.values(), { silent: options.silent });
+    return this;
 };
 
 /**
@@ -229,21 +229,21 @@ Store.prototype.clearSelected = function(options) {
  * @return {Store} this
  */
 Store.prototype.setSelected = function(featureIds, options) {
-  if(options===undefined){options={};}
-  featureIds = toDenseArray(featureIds);
+    if (options === undefined) { options = {}; }
+    featureIds = toDenseArray(featureIds);
 
-  // Deselect any features not in the new selection
-  this.deselect(this._selectedFeatureIds.values().filter(function(id){
-    return featureIds.indexOf(id) === -1;
-  }), { silent: options.silent });
+    // Deselect any features not in the new selection
+    this.deselect(this._selectedFeatureIds.values().filter(function(id) {
+        return featureIds.indexOf(id) === -1;
+    }), { silent: options.silent });
 
-  // Select any features in the new selection that were not already selected
-  var _this = this;
-  this.select(featureIds.filter(function(id){
-    return !_this._selectedFeatureIds.has(id);
-  }), { silent: options.silent });
+    // Select any features in the new selection that were not already selected
+    var _this = this;
+    this.select(featureIds.filter(function(id) {
+        return !_this._selectedFeatureIds.has(id);
+    }), { silent: options.silent });
 
-  return this;
+    return this;
 };
 
 /**
@@ -252,9 +252,9 @@ Store.prototype.setSelected = function(featureIds, options) {
  * @return {Store} this
  */
 Store.prototype.setSelectedCoordinates = function(coordinates) {
-  this._selectedCoordinates = coordinates;
-  this._emitSelectionChange = true;
-  return this;
+    this._selectedCoordinates = coordinates;
+    this._emitSelectionChange = true;
+    return this;
 };
 
 /**
@@ -263,17 +263,17 @@ Store.prototype.setSelectedCoordinates = function(coordinates) {
  * @return {Store} this
  */
 Store.prototype.clearSelectedCoordinates = function() {
-  this._selectedCoordinates = [];
-  this._emitSelectionChange = true;
-  return this;
+    this._selectedCoordinates = [];
+    this._emitSelectionChange = true;
+    return this;
 };
- 
+
 /**
  * Returns the ids of features in the current selection.
  * @return {Array<string>} Selected feature ids.
  */
 Store.prototype.getSelectedIds = function() {
-  return this._selectedFeatureIds.values();
+    return this._selectedFeatureIds.values();
 };
 
 /**
@@ -281,10 +281,10 @@ Store.prototype.getSelectedIds = function() {
  * @return {Array<Object>} Selected features.
  */
 Store.prototype.getSelected = function() {
-  var _this = this;
-  return this._selectedFeatureIds.values().map(
-    function(id){return _this.get(id)}
-  );
+    var _this = this;
+    return this._selectedFeatureIds.values().map(
+        function(id) { return _this.get(id) }
+    );
 };
 
 /**
@@ -292,7 +292,7 @@ Store.prototype.getSelected = function() {
  * @return {Array<Object>} Selected coordinates.
  */
 Store.prototype.getSelectedCoordinates = function() {
-  return this._selectedCoordinates;
+    return this._selectedCoordinates;
 };
 
 /**
@@ -301,7 +301,7 @@ Store.prototype.getSelectedCoordinates = function() {
  * @return {boolean} `true` if the feature is selected, `false` if not.
  */
 Store.prototype.isSelected = function(featureId) {
-  return this._selectedFeatureIds.has(featureId);
+    return this._selectedFeatureIds.has(featureId);
 };
 
 /**
@@ -311,15 +311,23 @@ Store.prototype.isSelected = function(featureId) {
  * @param {string} property property.
  * @param {string} property value
  */
- Store.prototype.setFeatureProperty = function(featureId, property ,value){
-  this.get(featureId).setProperty(property, value);
-  this.featureChanged(featureId);
- };
+Store.prototype.setFeatureProperty = function(featureId, property, value) {
+    this.get(featureId).setProperty(property, value);
+    this.featureChanged(featureId);
+};
 
- function refreshSelectedCoordinates(options) {
-  const newSelectedCoordinates = this._selectedCoordinates.filter(function(point){return this._selectedFeatureIds.has(point.feature_id)});
-  if (this._selectedCoordinates.length !== newSelectedCoordinates.length && !options.silent) {
-    this._emitSelectionChange = true;
-  }
-  this._selectedCoordinates = newSelectedCoordinates;
+Store.prototype.setFeatureCoordinates = function(featureId, path, lng, lat) {
+    let f = this.get(featureId);
+    if (f) {
+        f.updateCoordinate(path, lng, lat)
+        this.featureChanged(featureId);
+    }
+};
+
+function refreshSelectedCoordinates(options) {
+    const newSelectedCoordinates = this._selectedCoordinates.filter(function(point) { return this._selectedFeatureIds.has(point.feature_id) });
+    if (this._selectedCoordinates.length !== newSelectedCoordinates.length && !options.silent) {
+        this._emitSelectionChange = true;
+    }
+    this._selectedCoordinates = newSelectedCoordinates;
 }
