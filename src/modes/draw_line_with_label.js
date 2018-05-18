@@ -93,15 +93,16 @@ module.exports = function(ctx) {
 
                     var lineEnd = getLineEnd(point, line);
                     line.updateCoordinate(currentVertexPosition, lineEnd.lng, lineEnd.lat);
-                } else if (currentVertexPosition === 2) { //结束
-                    ctx.map.fire(Constants.events.CREATE, {
-                        features: [point.toGeoJSON(), line.toGeoJSON()]
-                    });
-                    ctx.events.changeMode(Constants.modes.STATIC);
-                    ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
-                    line.properties.mode = Constants.modes.SIMPLE_SELECT;
-                    point.properties.mode = Constants.modes.SIMPLE_SELECT;
                 }
+                /* else if (currentVertexPosition === 2) { //结束
+                                   ctx.map.fire(Constants.events.CREATE, {
+                                       features: [point.toGeoJSON(), line.toGeoJSON()]
+                                   });
+                                   ctx.events.changeMode(Constants.modes.STATIC);
+                                   ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
+                                   line.properties.mode = Constants.modes.SIMPLE_SELECT;
+                                   point.properties.mode = Constants.modes.SIMPLE_SELECT;
+                               } */
                 if (CommonSelectors.isVertex(e)) {
                     ctx.ui.queueMapClasses({ mouse: Constants.cursors.POINTER });
                 }
@@ -124,6 +125,15 @@ module.exports = function(ctx) {
                     line.updateCoordinate(currentVertexPosition, lineEnd.lng, lineEnd.lat);
                 }
                 currentVertexPosition++;
+                if (currentVertexPosition === 2) { //结束
+                    ctx.map.fire(Constants.events.CREATE, {
+                        features: [point.toGeoJSON(), line.toGeoJSON()]
+                    });
+                    ctx.events.changeMode(Constants.modes.STATIC);
+                    ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });
+                    line.properties.mode = Constants.modes.SIMPLE_SELECT;
+                    point.properties.mode = Constants.modes.SIMPLE_SELECT;
+                }
             });
             this.on('click', CommonSelectors.isVertex, function() {
                 return ctx.events.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [point.id, line.id] });

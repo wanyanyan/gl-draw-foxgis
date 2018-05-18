@@ -321,6 +321,7 @@ Store.prototype.setFeatureCoordinates = function(featureId, path, lng, lat) {
     if (f) {
         f.updateCoordinate(path, lng, lat)
         this.featureChanged(featureId);
+        this.render();
     }
 };
 
