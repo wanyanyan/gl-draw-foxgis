@@ -117,7 +117,7 @@ module.exports = function(ctx, options) {
             newPoint.x = pointXY.x;
             newPoint.y = pointXY.y + labelPointTextSize / 2 + 5;
         } */
-        var reg = /[0-9a-zA-Z]/g;
+        /* var reg = /[0-9a-zA-Z]/g;
         let regleng = text.match(reg)
         let charLength = text.length
         if (regleng) {
@@ -125,7 +125,8 @@ module.exports = function(ctx, options) {
             if (az > 0) {
                 charLength = text.length - az / 2
             }
-        }
+        } */
+        let charLength = getTextLength(text)
         if (ratio < 0 && pointFeature.coordinates[0] > lineLnglat[0][0]) { // 右上
             newPoint.x = pointXY.x - (charLength * labelPointTextSize / 2) - 5;
             newPoint.y = pointXY.y - (labelPointTextSize / 2);
@@ -148,7 +149,7 @@ module.exports = function(ctx, options) {
         var pointXY = ctx.map.project(coordinates);
         var ratio = getSlope(lineLnglat[0], coordinates);
         var newPoint = {};
-        var reg = /[0-9a-zA-Z]/g;
+        /* var reg = /[0-9a-zA-Z]/g;
         let regleng = text.match(reg)
         let charLength = text.length
         if (regleng) {
@@ -156,7 +157,8 @@ module.exports = function(ctx, options) {
             if (az > 0) {
                 charLength = text.length - az / 2
             }
-        }
+        } */
+        let charLength = getTextLength(text)
         if (ratio < 0 && coordinates[0] > lineLnglat[0][0]) { // 右上
             newPoint.x = pointXY.x + (charLength * labelPointTextSize / 2) + 5;
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
@@ -171,6 +173,34 @@ module.exports = function(ctx, options) {
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
         }
         return ctx.map.unproject(newPoint);
+    }
+    var getTextLength = function(text) {
+        var reg = /[0-9a-z]/g;
+        let regleng = text.match(reg)
+        let charLength = text.length
+        if (regleng) {
+            let az = regleng.length
+            if (az > 0) {
+                charLength = text.length - az / 2
+            }
+        }
+        reg = /[A-Z]/g;
+        regleng = text.match(reg)
+        if (regleng) {
+            let az = regleng.length
+            if (az > 0) {
+                charLength = charLength - az / 3
+            }
+        }
+        /* reg = /\s/g;
+        regleng = text.match(reg)
+        if(regleng){
+          let az = regleng.length
+          if(az>0){
+            charLength = charLength - 2*az/3
+          }
+        } */
+        return charLength
     }
     var getSlope = function(p1, p2) {
         return (p2[1] - p1[1]) / (p2[0] - p1[0]);
