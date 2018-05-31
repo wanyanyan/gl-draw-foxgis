@@ -117,18 +117,26 @@ module.exports = function(ctx, options) {
             newPoint.x = pointXY.x;
             newPoint.y = pointXY.y + labelPointTextSize / 2 + 5;
         } */
-
+        var reg = /[0-9a-zA-Z]/g;
+        let regleng = text.match(reg)
+        let charLength = text.length
+        if (regleng) {
+            let az = regleng.length
+            if (az > 0) {
+                charLength = text.length - az / 2
+            }
+        }
         if (ratio < 0 && pointFeature.coordinates[0] > lineLnglat[0][0]) { // 右上
-            newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+            newPoint.x = pointXY.x - (charLength * labelPointTextSize / 2) - 5;
             newPoint.y = pointXY.y - (labelPointTextSize / 2);
         } else if (ratio >= 0 && pointFeature.coordinates[0] >= lineLnglat[0][0]) { // 右下
-            newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+            newPoint.x = pointXY.x - (charLength * labelPointTextSize / 2) - 5;
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
         } else if (ratio < 0 && pointFeature.coordinates[0] < lineLnglat[0][0]) { // 左上
-            newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+            newPoint.x = pointXY.x + (charLength * labelPointTextSize / 2) + 5;
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
         } else if (ratio >= 0 && pointFeature.coordinates[0] <= lineLnglat[0][0]) { // 左下
-            newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+            newPoint.x = pointXY.x + (charLength * labelPointTextSize / 2) + 5;
             newPoint.y = pointXY.y - (labelPointTextSize / 2);
         }
         return ctx.map.unproject(newPoint);
@@ -140,17 +148,26 @@ module.exports = function(ctx, options) {
         var pointXY = ctx.map.project(coordinates);
         var ratio = getSlope(lineLnglat[0], coordinates);
         var newPoint = {};
+        var reg = /[0-9a-zA-Z]/g;
+        let regleng = text.match(reg)
+        let charLength = text.length
+        if (regleng) {
+            let az = regleng.length
+            if (az > 0) {
+                charLength = text.length - az / 2
+            }
+        }
         if (ratio < 0 && coordinates[0] > lineLnglat[0][0]) { // 右上
-            newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+            newPoint.x = pointXY.x + (charLength * labelPointTextSize / 2) + 5;
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
         } else if (ratio >= 0 && coordinates[0] >= lineLnglat[0][0]) { // 右下
-            newPoint.x = pointXY.x + (text.length * labelPointTextSize / 2) + 5;
+            newPoint.x = pointXY.x + (charLength * labelPointTextSize / 2) + 5;
             newPoint.y = pointXY.y - (labelPointTextSize / 2);
         } else if (ratio < 0 && coordinates[0] < lineLnglat[0][0]) { // 左上
-            newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+            newPoint.x = pointXY.x - (charLength * labelPointTextSize / 2) - 5;
             newPoint.y = pointXY.y - (labelPointTextSize / 2);
         } else if (ratio >= 0 && coordinates[0] <= lineLnglat[0][0]) { // 左下
-            newPoint.x = pointXY.x - (text.length * labelPointTextSize / 2) - 5;
+            newPoint.x = pointXY.x - (charLength * labelPointTextSize / 2) - 5;
             newPoint.y = pointXY.y + (labelPointTextSize / 2);
         }
         return ctx.map.unproject(newPoint);
