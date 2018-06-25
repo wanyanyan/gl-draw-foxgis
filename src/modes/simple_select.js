@@ -573,7 +573,9 @@ module.exports = function(ctx, options) {
             }
             push(geojson);
             if (geojson.properties.active !== Constants.activeStates.ACTIVE ||
-                geojson.geometry.type === Constants.geojsonTypes.POINT) return;
+                geojson.geometry.type === Constants.geojsonTypes.POINT) {
+                return
+            };
             if (geojson.properties.type === Constants.featureTypes.POINT ||
                 geojson.properties.type === Constants.featureTypes.LINE) {
                 createSupplementaryPoints(geojson).forEach(push);
