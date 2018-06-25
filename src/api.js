@@ -77,7 +77,7 @@ module.exports = function(ctx, api) {
         const featureCollection = JSON.parse(JSON.stringify(normalize(geojson)));
 
         const ids = featureCollection.features.map(function(feature) {
-            feature.id = feature.id || hat();
+            feature.id = feature.geometry.id || hat();
 
             if (feature.geometry === null) {
                 throw new Error('Invalid geometry: null');
