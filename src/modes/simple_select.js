@@ -225,6 +225,113 @@ module.exports = function(ctx, options) {
         feature.updateCoordinate(0, lineEnd.lng, lineEnd.lat);
     };
 
+    var dragVertex3 = function(target, delta) {
+        var target = ctx.store.getSelected();
+        if (target.length > 1) {
+            return
+        }
+        // var lineLnglat = target[0].coordinates[1];
+        let associatedFeatureId = target[0].properties.associatedFeatureId
+        if (!associatedFeatureId) {
+            return
+        }
+        var all = ctx.store.getAll();
+        let features = all.filter(function(f) {
+            return f.properties.associatedFeatureId == associatedFeatureId && f.id != target[0].id
+        })
+        if (target[0].properties.modechild == 'icon') {
+            for (let i = 0; i < features.length; i++) {
+                let feature = features[i]
+                if (feature.properties.modechild == 'line') {
+                    feature.updateCoordinate(0, target[0].coordinates[0], target[0].coordinates[1]);
+                }
+
+            }
+        } else if (target[0].properties.modechild == 'line') {
+            for (let i = 0; i < features.length; i++) {
+                let feature = features[i]
+                let coors = target[0].coordinates
+                if (feature.properties.modechild == 'icon') {
+                    feature.updateCoordinate(0, coors[0][0], coors[0][1]);
+                }
+                if (feature.properties.modechild == 'text') {
+                    feature.updateCoordinate(0, coors[coors.length - 1][0], coors[coors.length - 1][1]);
+                }
+                if (feature.properties.modechild == 'rect') {
+                    let p0 = feature.coordinates[0][0]
+                    let p2 = feature.coordinates[0][2]
+                    let center = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2]
+                    let offsetX = coors[coors.length - 1][0] - center[0]
+                    let offsetY = coors[coors.length - 1][1] - center[1]
+                    let coordinates = feature.coordinates[0]
+                    for (let j = 0; j < coordinates.length; j++) {
+                        let coor = coordinates[j]
+                        feature.updateCoordinate('0.' + j, coor[0] + offsetX, coor[1] + offsetY);
+                    }
+                }
+            }
+
+        } else if (target[0].properties.modechild == 'rect') {
+            let p0 = target[0].coordinates[0][0]
+            let p2 = target[0].coordinates[0][2]
+            let center = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2]
+            for (let i = 0; i < features.length; i++) {
+                let feature = features[i]
+                if (feature.properties.modechild == 'line') {
+                    feature.updateCoordinate(feature.coordinates.length - 1, center[0], center[1]);
+                }
+                if (feature.properties.modechild == 'text') {
+                    feature.updateCoordinate(0, center[0], center[1]);
+                }
+            }
+
+        } else if (target[0].properties.modechild == 'text') {
+            for (let i = 0; i < features.length; i++) {
+                let feature = features[i]
+                if (feature.properties.modechild == 'line') {
+                    feature.updateCoordinate(feature.coordinates.length - 1, target[0].coordinates[0], target[0].coordinates[1]);
+                }
+                if (feature.properties.modechild == 'rect') {
+                    let p0 = feature.coordinates[0][0]
+                    let p2 = feature.coordinates[0][2]
+                    let center = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2]
+                    let offsetX = target[0].coordinates[0] - center[0]
+                    let offsetY = target[0].coordinates[1] - center[1]
+                    let coors = feature.coordinates[0]
+                    for (let j = 0; j < coors.length; j++) {
+                        let coor = coors[j]
+                        feature.updateCoordinate('0.' + j, coor[0] + offsetX, coor[1] + offsetY);
+                    }
+                }
+            }
+        }
+    };
+
+    var dragVertex4 = function(target, delta) {
+        if (target.type == "Polygon" && target.properties.modechild == 'rect' && target.properties.associatedFeatureId) {
+            let associatedFeatureId = target.properties.associatedFeatureId
+            if (!associatedFeatureId) {
+                return
+            }
+            var all = ctx.store.getAll();
+            let features = all.filter(function(f) {
+                return f.properties.associatedFeatureId == associatedFeatureId && f.id != target.id
+            })
+            let p0 = target.coordinates[0][0]
+            let p2 = target.coordinates[0][2]
+            let center = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2]
+            for (let i = 0; i < features.length; i++) {
+                let feature = features[i]
+                if (feature.properties.modechild == 'line') {
+                    feature.updateCoordinate(feature.coordinates.length - 1, center[0], center[1]);
+                }
+                if (feature.properties.modechild == 'text') {
+                    feature.updateCoordinate(0, center[0], center[1]);
+                }
+            }
+        }
+    }
+
     return {
         stop: function() {
             var initialDoubleClickZoomState = ctx.map ? ctx.map.doubleClickZoom.isEnabled() : true;
@@ -480,6 +587,7 @@ module.exports = function(ctx, options) {
                             break;
                     }
                     transformFeatures(ctx, [transformTarget], matrix);
+                    dragVertex4(transformTarget, del)
                 } else {
                     if (isLabelPoint) {
                         if (!isLabelPointLine) {
@@ -492,6 +600,8 @@ module.exports = function(ctx, options) {
 
                             dragVertex2(e, del);
                         }
+                    } else {
+                        dragVertex3(e, del)
                     }
                     matrix[0][2] = delta.x;
                     matrix[1][2] = delta.y;
