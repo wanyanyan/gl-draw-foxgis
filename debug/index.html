@@ -66,6 +66,7 @@
         <div id='start-bezier_dovetail_arrow'>曲线燕尾</div>
         <div id='start-line-with-label'>带线标注</div>
         <div id='start-label-line'>沿线标注</div>
+        <div id='reset-coordinates'>设置坐标</div>
     </div>
     <div class='toggle'>
         <button id='addBtn'>add draw</button>
@@ -106,7 +107,7 @@
             center: args.latlng || [116, 30],
             projection: 'EPSG:3857',
             /*style: 'mapbox://styles/mapbox/streets-v8'*/
-            style: 'http://localhost:3000/api/v1/styles/gl-draw'
+            style: 'http://localhost:3009/api/v1/styles/gl-draw'
         });
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-left');
@@ -154,7 +155,7 @@
             var startDoveTailArrow = document.getElementById('start-dovetail_arrow');
             var startBezierDoveTailArrow = document.getElementById('start-bezier_dovetail_arrow');
 
-
+            var resetCoordinates = document.getElementById('reset-coordinates');
             startPoint.onclick = function() {
                 Draw.changeMode('draw_point');
             };
@@ -214,6 +215,18 @@
             startBezierDoveTailArrow.onclick = function() {
                 Draw.changeMode('draw_bezier_dovetail_arrow');
             }
+
+            resetCoordinates.onclick = function() {
+                let drawFeatures = Draw.getAll().features
+                if (drawFeatures.length > 0) {
+                    let cors = [
+                        [115.26391601565689, 29.807145821530384],
+                        [116.05493164071407, 30.23282956500]
+                    ]
+                    Draw.setFeatureCoordinates(drawFeatures[0].id, 1, 116.05493164071407, 30.23282956500);
+                }
+            }
+
         });
 
         var loadData = function(uri) {
